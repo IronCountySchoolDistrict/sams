@@ -1,0 +1,16 @@
+<script type="text/template" id="sams-tab-template">
+    <li class="~[if.~[gpv:repType]=SAMS]selected[/if]">
+        <a href="~[if.~[gpv:repType]=SAMS]#[else]/admin/reports/sams.html[/if]">~[text:psx.htmlc.admin_reports.reporttabs.sams]</a>
+    </li>
+</script>
+
+<script>
+    $j(function() {
+        var samsTab = $j($j('#sams-tab-template').html());
+        var insertSelector = $j('.tabs').find('li').first();
+        if (insertSelector.find('a').text() === 'ICSDReports') {
+            insertSelector = insertSelector.next();
+        }
+        samsTab.insertBefore(insertSelector);
+    });
+</script>

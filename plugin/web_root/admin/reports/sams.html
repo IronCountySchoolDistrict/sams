@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<head>
+<title>SAMS</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+<script src="/admin/javascript/hierarchical.js"></script>
+<script src="/admin/javascript/ajaxuservar.js"></script>
+<script>
+    $j(document).ready(function () {
+        setinitialstate('SAMS', 0, 'SAMS');
+        collapseall('SAMS');
+    });
+</script>
+
+<script type="text/javascript">
+
+    function tml() {
+        var frm = document.getElementById('MaxLoad');
+        if (frm && frm.style.display == 'none') {
+
+            frm.style.display = 'block';
+        } else {
+            frm.style.display = 'none';
+        }
+    }
+
+    function livelistupdate() {
+        var ll = document.getElementById('livelist');
+        var ht = document.getElementById('selectedTeacher');
+        if (ll && ht) {
+            ht.value = ll.options[ll.selectedIndex].text;
+        }
+    }
+
+
+    function show(section) {
+        if (document.getElementById(section).style.display === "none") {
+            document.getElementById(section).style.display = "block";
+        }
+    }
+
+    window.onload = function () {
+        var vlivelist = document.getElementById('livelist');
+        if (vlivelist) {
+            vlivelist.onclick = livelistupdate;
+        }
+
+
+        var maxlink = document.getElementById('maxloadlink');
+        if (maxlink) {
+            maxlink.onclick = tml;
+        }
+    };
+
+</script>
+<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/scripts/sams/tablefilter/filtergrid.css" type="text/css">
+<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/scripts/sams/tablefilter/TF_Themes/Default/TF_Default.css" type="text/css">
+<script src="<!-- @echo IMAGE_SERVER_URL -->/scripts/sams/PS_Secure.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/scripts/sams/samscookies.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/scripts/sams/ext/tablefilter/tablefilter_all_min.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/scripts/sams/ext/tablefilter/tfAdapter.sortabletable.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/scripts/sams/ext/tablefilter/sortabletable.js"></script>
+<script type="text/template" id="sams-img-template">
+    <a href="/admin/reports/sams.html" style="margin-left: 200px; margin-top: -25px;">
+        <img src="<img src='<!-- @echo IMAGE_SERVER_URL -->/images/sams/sams.png" alt="Sams" height="28"/>
+    </a>
+</script>
+<script>
+    //Insert SAMS image into #branding-powerschool
+    //This method of insertion alleviateds the need for a customized admin_header_css wildcard.
+    $j(document).ready(function () {
+        var template = $j($j('#sams-img-template').html());
+        var insertionPoint = $j('#branding-powerschool');
+        insertionPoint.append(template);
+    });
+</script>
+<style>
+    .ui-dialog .ui-dialog-title .ui-icon {
+        float: left;
+        margin-right: 4px;
+    }
+
+    a:link img {
+        border: none;
+    }
+
+    .helpBtn {
+        visibility: hidden;
+    }
+</style>
+
+<script type='text/javascript'>
+~[wc:sams]
+require(["jquery"], function($) {
+    var $ = jQuery.noConflict();
+    var students = "~[studentlist]~(studentfrn),[/studentlist]";
+    var studentscount = ~[x:functionssetselection]~[x:studsinset];
+    $(document).ready(function () {
+
+    //RETURN TYPE? --------------------
+        if (checkCookie("returntype") == "assessmentsummary") {
+            setCookie("returntype", "", 365);
+            $('#samscontainer').fadeOut('slow', function () {
+            });
+            var authkey = $('#crttogpaat').val();
+            var url = "students=" + students + "&at=" + authkey + "&YearID=~(yearid)&Count=" + studentscount;
+            $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/></div>");
+            $('#loader').show();
+            $.ajax({
+                dataType: 'jsonp',
+                data: url,
+                jsonp: 'jsonp_callback',
+                url: "https://" + samsLocation + "Assessment/AssessmentSummary.php",
+                success: function (msg) {
+                    $('#loader').hide();
+                    $("#reporttable").html(msg);
+                    crt_pop();
+                }
+            });
+        }
+        if (checkCookie("returntype") == "crttogpa") {
+            setCookie("returntype", "", 365);
+            var subject = checkCookie("returncat");
+            showCRTtoGPAReport(subject);
+        }
+        if (checkCookie("returntype") == "crtforclass") {
+            setCookie("returntype", "", 365);
+            var subject = checkCookie("returncat");
+            showCRTforClassReport(subject);
+        }
+        if (checkCookie("returntype") == "crtyeartoyear") {
+            setCookie("returntype", "", 365);
+            var subject = checkCookie("returncat");
+            showYeartoYearReport(subject);
+        }
+        if (checkCookie("returntype") == "crtselectedprofile") {
+            setCookie("returntype", "", 365);
+            $('#samscontainer').fadeOut('slow', function () {
+            });
+            window.location = '/admin/sams/selectedprofile.html';
+        }
+    //END RETURN TYPE
+        $('#assessmentsummary').click(function () {
+            if (studentscount === 0) {
+                showNoStudents();
+            }
+            else {
+
+                $('#samscontainer').fadeOut('slow', function () {
+                });
+                var authkey = $('#crttogpaat').val();
+                var url = "students=" + students + "&at=" + authkey + "&YearID=~(yearid)&Count=" + studentscount;
+                $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/></div>");
+                $('#loader').show();
+                $.ajax({
+                    dataType: 'jsonp',
+                    data: url,
+                    jsonp: 'jsonp_callback',
+                    url: "https://" + samsLocation + "Assessment/AssessmentSummary.php",
+                    success: function (msg) {
+                        $('#loader').hide();
+                        $("#reporttable").html(msg);
+                        crt_pop();
+                    }
+                });
+            }
+        });
+
+        $('#selectedprofile').click(function () {
+            if (studentscount === 0) {
+                showNoStudents();
+            }
+            else {
+                $('#samscontainer').fadeOut('slow', function () {
+                });
+                window.location = '/admin/sams/selectedprofile.html';
+            }
+        });
+
+        $('#studentroster').click(function () {
+            if (studentscount === 0) {
+                showNoStudents();
+            }
+            else {
+                $('#samscontainer').fadeOut('slow', function () {
+                    window.location = '/admin/sams/studentroster.html';
+                });
+            }
+        });
+
+        $('#crttogpa').click(function () {
+            if (studentscount === 0) {
+                $('#crttogpaform').hide();
+                showNoStudents();
+            }
+            else {
+                $('#crttogpaform').fadeIn('slow', function () {
+                });
+            }
+        });
+
+        $('#crtforclass').click(function () {
+            if (studentscount === 0) {
+                $('#crtforclassform').hide();
+                showNoStudents();
+            }
+            else {
+                $('#crtforclassform').fadeIn('slow', function () {
+                });
+            }
+        });
+
+        $('#yeartoyear').click(function () {
+            if (studentscount === 0) {
+                $('#yeartoyearform').hide();
+                showNoStudents();
+            }
+            else {
+                $('#yeartoyearform').fadeIn('slow', function () {
+                });
+            }
+        });
+        $noStudents = $('#nostudents');
+        $noStudents.dialog({
+            modal: true,
+            title: "<span class='ui-icon ui-icon-alert'></span><b>Warning:</b> No Students Selected",
+            resizable: false,
+            autoOpen: false,
+            width: 450,
+            position: 'center',
+            buttons: {
+                Close: function () {
+                    closeNoStudents();
+                },
+                'Select Students': function () {
+                    window.location = '/admin/home.html';
+                }
+            }
+        });
+        $('#yeartoyearformsubmit').click(function () {
+            var subject = $('#yeartoyearsubject :selected').val();
+            setCookie("returncat", subject, 385);
+            showYeartoYearReport(subject);
+
+        });
+
+        $('#crtforclassformsubmit').click(function () {
+            var subject = $('#crtforclassformsubject :selected').val();
+            setCookie("returncat", subject, 385);
+            showCRTforClassReport(subject);
+
+        });
+
+        $('#crttogpaformsubmit').click(function () {
+            var subject = $('#crttogpaformsubject :selected').val();
+            setCookie("returncat", subject, 385);
+            showCRTtoGPAReport(subject);
+
+        });
+
+    });
+
+    /*CRT TO GPA*/
+    var showCRTtoGPAReport = function (subject) {
+        $('#samscontainer').fadeOut('slow', function () {
+        });
+        var authkey = $('#crttogpaat').val();
+        var url = "students=" + students + "&at=" + authkey + "&YearID=~(yearid)&Count=" + studentscount + "&Subject=" + subject;
+        $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/></div>");
+        $('#loader').show();
+        $.ajax({
+            dataType: 'jsonp',
+            data: url,
+            jsonp: 'jsonp_callback',
+            url: "https://" + samsLocation + "Assessment/CRT_to_GPA2.php",
+            success: function (msg) {
+                $('#loader').hide();
+                $("#reporttable").html(msg);
+                crt_pop();
+            }
+        });
+    };
+    /*CRT FOR CLASS*/
+    var showCRTforClassReport = function (subject) {
+        $('#samscontainer').fadeOut('slow', function () {
+        });
+        var authkey = $('#crtforclassat').val();
+        var url = "students=" + students + "&at=" + authkey + "&YearID=~(yearid)&Count=" + studentscount + "&Subject=" + subject;
+        $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/></div>");
+        $('#loader').show();
+    //$('#reporttable').fadeOut('slow', function() {});
+        $.ajax({
+            dataType: 'jsonp',
+            data: url,
+            jsonp: 'jsonp_callback',
+            url: "https://" + samsLocation + "Assessment/CRT_For_Class2.php",
+            success: function (msg) {
+                $('#loader').hide();
+                $('#reporttable').fadeIn('slow', function () {
+                });
+                $("#reporttable").html(msg);
+                crt_pop();
+            }
+        });
+    };
+    /*CRT FOR Year to Year*/
+    var showYeartoYearReport = function (subject) {
+        $('#samscontainer').fadeOut('slow', function () {
+        });
+        var authkey = $('#yeartoyearat').val();
+        var url = "students=" + students + "&at=" + authkey + "&YearID=~(yearid)&Count=" + studentscount + "&Subject=" + subject;
+        $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/></div>");
+        $('#loader').show();
+        $.ajax({
+            dataType: 'jsonp',
+            data: url,
+            jsonp: 'jsonp_callback',
+            url: "https://" + samsLocation + "Assessment/CRT_Year_to_Year2.php",
+            success: function (msg) {
+                $('#loader').hide();
+                $("#reporttable").html(msg);
+                crt_pop();
+            }
+        });
+    };
+    //function to show dialog
+    var showNoStudents = function () {
+        //if the contents have been hidden with css, you need this
+        $noStudents.show();
+        $('#nostudents').html("<div style='padding: 5px 5px;'>No Students Selected, Please select students first to run the report.<br><br><font style='font-weight: bold; color: red'>Select Students:</font> This will take you away from SAMS.</div>");
+        //open the dialog
+        $noStudents.dialog("open");
+    };
+
+    //function to close dialog, probably called by a button in the dialog
+    var closeNoStudents = function () {
+        $noStudents.dialog("close");
+    };
+
+
+    function crt_pop() {
+        $crt_pop_dialog = $('#crt_pop_dialog');
+        $crt_pop_dialog.dialog({
+            modal: false,
+            title: '',
+            resizable: true,
+            autoOpen: false,
+            position: 'center',
+            width: 850,
+            buttons: {
+                Close: function () {
+                    closeCRT_POP();
+                }
+            }
+        });
+
+        var closeCRT_POP = function () {
+            $crt_pop_dialog.dialog('close');
+            $.getScript('/scripts/jquery-ui-1.8.13.custom.min.js');
+        };
+        $('.crt_pop').click(function () {
+            $.ajax({
+                dataType: 'jsonp',
+                jsonp: 'jsonp_callback',
+                url: $(this).attr('alt'),
+                success: function (msg) {
+                    $('#crt_pop_dialog').html("<center>" + msg + "</center>");
+                    $crt_pop_dialog.show();
+                    $crt_pop_dialog.dialog('open');
+                }
+            });
+        });
+    }
+});
+
+
+
+
+</script>
+</head>
+<body>
+<div id='crt_pop_dialog'></div>
+<div id='nostudents'></div>
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.runreports.start_page]</a>&gt;
+<a href="/admin/reports/home.html">~[text:psx.html.admin_reports.runreports.reports]</a> &gt; SAMS
+<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>SAMS</h1>
+
+<div id='reporttitle' style='padding-left: 20px'></div>
+~[SetPostValue:repType=SAMS]
+
+~[x:insertfile;reporttabs.html]
+
+<!-- start of content and bounding box -->
+<div class="box-round">
+    <div id='reporttable'>
+        <center><span id='loader'></span></center>
+    </div>
+
+    <div id='samscontainer'>
+        <table border="0" cellspacing="0" cellpadding="4" width="100%" id="SAMS">
+            <tr>
+                <td>
+                    <span style="color:Red; font-weight: bold;">* (Select Students first)</span>
+                </td>
+                <td>
+                    <!-- Align the Expand and Collapse links with the Description header with margin-left. -->
+                    <div style="margin-left: -79px;">
+                        <a href="javascript:expandall('SAMS');">Expand All</a>
+                        &nbsp;
+                        <a href="javascript:collapseall('SAMS');">Collapse All</a>
+                    </div>
+                </td>
+
+            </tr>
+            <tr bgcolor="#f6f6f6">
+                <td class="bold" width="50%">Report</td>
+                <td class="bold" width="50%">Description</td>
+            </tr>
+
+            <tr id="grpProfiles" class="evenRow level_0 hidecount_0 haschildren isCollapsed" valign="baseline">
+                <td colspan="4">
+                    <img src="/images/listblank.gif" height="11" width="0" alt border="0"/>
+                    <a href="javascript:toggle('grpProfiles');">
+                        <img id="grpProfiles-img" width="14" height="11" border="0" alt=""
+                             src="/images/listcollapsed.gif"/>
+                        <b>Profiles</b>
+                    </a>
+                </td>
+
+            </tr>
+            <div id="cust-sams-profiles">~[cust.insertion_point:sams.profiles]</div>
+
+            <tr id="grpAssessments" class="evenRow level_0 hidecount_0 haschildren isCollapsed" valign="baseline">
+                <td colspan="4">
+                    <img src="/images/listblank.gif" height="11" width="0" alt border="0"/>
+                    <a href="javascript:toggle('grpAssessments');">
+                        <img id="grpAssessments-img" width="14" height="11" border="0" alt=""
+                             src="/images/listcollapsed.gif"/>
+                        <b>Assessments</b>
+                    </a>
+                </td>
+
+
+            </tr>
+            <div id="cust-sams-assessments">~[cust.insertion_point:sams.assessments]</div>
+
+
+            <tr id="grpGrades" class="evenRow level_0 hidecount_0 haschildren isCollapsed" valign="baseline">
+                <td colspan="4">
+                    <img src="/images/listblank.gif" height="11" width="0" alt border="0"/>
+                    <a href="javascript:toggle('grpGrades');">
+                        <img id="grpGrades-img" width="14" height="11" border="0" alt=""
+                             src="/images/listcollapsed.gif"/>
+                        <b>Grades</b>
+                    </a>
+                </td>
+
+            </tr>
+            <div id="cust-sams-grades">~[cust.insertion_point:sams.grades]</div>
+
+            <tr id="grpAttendance" class="evenRow level_0 hidecount_0 haschildren isCollapsed" valign="baseline">
+                <td colspan="4">
+                    <img src="/images/listblank.gif" height="11" width="0" alt border="0"/>
+                    <a href="javascript:toggle('grpAttendance');">
+                        <img id="grpAttendance-img" width="14" height="11" border="0" alt=""
+                             src="/images/listcollapsed.gif"/>
+                        <b>Attendance</b>
+                    </a>
+                </td>
+
+            </tr>
+            <div id="cust-sams-attendance">~[cust.insertion_point:sams.attendance]</div>
+
+
+            <tr id="grpDatacheck" class="evenRow level_0 hidecount_0 haschildren isCollapsed" valign="baseline">
+                <td colspan="4">
+                    <img src="/images/listblank.gif" height="11" width="0" alt border="0"/>
+                    <a href="javascript:toggle('grpDatacheck');">
+                        <img id="grpDatacheck-img" width="14" height="11" border="0" alt=""
+                             src="/images/listcollapsed.gif"/>
+                        <b>Data Check</b>
+                    </a>
+                </td>
+
+            </tr>
+            <div id="cust-sams-datacheck">~[cust.insertion_point:sams.datacheck]</div>
+
+
+            <tr id="grpHealth" class="evenRow level_0 hidecount_0 haschildren isCollapsed" valign="baseline">
+                <td colspan="4">
+                    <img src="/images/listblank.gif" height="11" width="0" alt border="0"/>
+                    <a href="javascript:toggle('grpHealth');">
+                        <img id="grpHealth-img" width="14" height="11" border="0" alt=""
+                             src="/images/listcollapsed.gif"/>
+                        <b>Health</b>
+                    </a>
+                </td>
+
+            </tr>
+            <div id="cust-sams-health">~[cust.insertion_point:sams.health]</div>
+
+
+            <tr id="grpInformation" class="evenRow level_0 hidecount_0 haschildren isCollapsed" valign="baseline">
+                <td colspan="4">
+                    <img src="/images/listblank.gif" height="11" width="0" alt border="0"/>
+                    <a href="javascript:toggle('grpInformation');">
+                        <img id="grpInformation-img" width="14" height="11" border="0" alt=""
+                             src="/images/listcollapsed.gif"/>
+                        <b>Information</b>
+                    </a>
+                </td>
+
+            </tr>
+            <div id="cust-sams-information">~[cust.insertion_point:sams.information]</div>
+
+
+            <tr id="grpOther" class="evenRow level_0 hidecount_0 haschildren isCollapsed" valign="baseline">
+                <td colspan="4">
+                    <img src="/images/listblank.gif" height="11" width="0" alt border="0"/>
+                    <a href="javascript:toggle('grpOther');">
+                        <img id="grpOther-img" width="14" height="11" border="0" alt=""
+                             src="/images/listcollapsed.gif"/>
+                        <b>Other</b>
+                    </a>
+                </td>
+            </tr>
+            <div id="cust-sams-other">~[cust.insertion_point:sams.other]</div>
+
+
+        </table>
+    </div>
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

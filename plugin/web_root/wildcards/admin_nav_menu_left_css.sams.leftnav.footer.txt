@@ -1,0 +1,17 @@
+<!-- Start Sams custom content -->
+<script type="text/template" id="sams-template">
+    <!-- Start Sams custom content -->
+    <li><a href="/admin/reports/sams.html" id="navSamsReports" title="Sams">Sams</a></li>
+    <!-- End Sams custom content -->
+
+</script>
+
+<script>
+    $j(function () {
+        // Insert Sams Link
+        var samsHtml = $j($j('#sams-template').html());
+        var select = $j('#navSysReports').parent();
+        samsHtml.insertBefore(select);
+    });
+</script>
+<!-- End Sams custom content -->

@@ -1,0 +1,30 @@
+~[frame_type:none]
+<!-- start of shell for entire page  -->
+<div id="container" class="group">
+    <!-- start of shell for entire page  -->
+    <!-- logo, school, term, logoff, help -->
+    <div id="header" class="group">
+        <ul id="tools" class="group">
+            <li id="userName" title="~[wc:login_lastlogin]">~[text:psx.common.welcome] <span>~[x:username;firstlast]</span></li>
+            <li><a href="javascript:helpwindow('~[x:help_pagelink]')" id="btnHelp" title="~[text:psx.common.help_title]" accesskey="?">~[text:psx.common.help]</a></li>
+            <li><a href="~loff" id="btnLogout" target="_top" title="~[text:psx.common.sign_out_title]" accesskey="l">~[text:psx.common.sign_out]</a></li>
+        </ul>
+        <div id="branding-powerschool">
+            <a href="/admin/home.html" target="_top">&nbsp;</a>
+            <a href='/admin/reports/sams.html' style="margin-left: 200px; margin-top: -25px;">
+                <img src='<!-- @echo IMAGE_SERVER_URL -->/images/sams/sams.png' alt='Sams' height='28' />
+            </a>
+        </div>
+        <div id="currentscope">
+            <a href="/admin/widgets/schoolchoice.action" id="schoolContext" class="replaceNext" title="~[text:psx.common.school_title]" >~[text:psx.common.school] </a>
+            <span id="schoolText">~[schoolname]</span>
+            <a href="/admin/terms/changetermcontext.html" id="termContext" class="replaceNext" title="~[text:psx.common.term_title]" >~[text:psx.common.term] </a>
+            <span id="termText">~[termname]</span>
+        </div>
+        <div id="cust-content-header">~[cust.insertion_point:content.header]</div>
+    </div>
+    <!--logo, school, term, logoff, help -->
+    <div id="usercontext-bar">
+        <a href="/admin/home.html" id="linkBrandingHome" target="_top"></a>
+        <div id="breadcrumbs">
+            <!--Breadcrumbs in page, close in admin-navigation wc-->
