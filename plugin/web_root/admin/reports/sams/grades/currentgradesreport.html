@@ -7,11 +7,6 @@
     <link href="/images/css/print.css" rel="stylesheet" media="print">
     <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/filtergrid.css" type="text/css">
     <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
-    <script>
-        var tfConfig = {
-            base_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter"
-        };
-    </script>
     <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/tablefilter_all.js"></script>
     <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/sortabletable.js"></script>
     <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/tfAdapter.sortabletable.js"></script>
@@ -27,6 +22,8 @@
         $(document).ready(function () {
             'use strict';
             var gradetable_Props = {
+                base_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/",
+                themes_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/",                
                 col_1: "select",
                 col_2: "select",
                 col_4: "select",
@@ -40,9 +37,22 @@
                 btn_reset: true,
                 btn_reset_text: "Clear all ",
                 loader: true,
-                loader_html: '<img src="<!-- @echo IMAGE_SERVER_URL -->/images/sams/ext/tablefilter/img_loading.gif"/> Filtering data...',
+                loader_html: '<img src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/Default/images/img_loading.gif"/> Filtering data...',
                 display_all_text: " [ Show all ] ",
-                sort_select: true
+                sort_select: true,
+                sort_config: {
+                    sort_types: [
+                        "String", //LastFirst 
+                        "Number", //Grade Level
+                        "String", //Grade
+                        "Number", //Percent
+                        "String", //Course Name
+                        "String", //Expression
+                        "String", //Teacher
+                        "String", //Advisor
+                        "Date"    //Last Grade Update
+                    ]
+                }
             };
             var tf2 = setFilterGrid("gradetable", gradetable_Props);
         });
@@ -211,7 +221,7 @@
 
             ~[x:GetDoThisForStudents]
             ~[tlist_sql;
-            SELECT s.dcid, s.LastFirst, s.grade_level, pgf.Grade, pgf.Percent, c.Course_Name, sec.Expression,
+            SELECT s.dcid, s.LastFirst, s.grade_level, pgf.Grade, trim(pgf.Percent), c.Course_Name, sec.Expression,
             t.LastFirst, ps_customfields.getSTUDENTScf(s.id, 'advisor'), cc.LastGradeUpdate
             FROM
             (SELECT pgf.studentid id, count(*)
