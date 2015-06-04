@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAMS - Current Grades Report</title>
+    ~[wc:commonscripts]
+    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="/images/css/print.css" rel="stylesheet" media="print">
+    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/filtergrid.css" type="text/css">
+    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+    <script>
+        var tfConfig = {
+            base_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter"
+        };
+    </script>
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/tablefilter_all.js"></script>
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/sortabletable.js"></script>
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/tfAdapter.sortabletable.js"></script>
+    
+    <script>
+        function actionChange() {
+            document.gradesform.action = 'currentgradesreport.html?dothisfor=selected&tm=' + document.gradesform.term.value + '&gd=' + document.gradesform.grade.value + '&mn=' + document.gradesform.minnum.value + '&maxn=' + document.gradesform.maxnum.value +'&se=' + document.gradesform.choice.value + '&advisor=' + document.gradesform.advisor.value;
+        }
+    </script>
+
+    <script>
+    require(["jquery"], function($) {
+        $(document).ready(function () {
+            'use strict';
+            var gradetable_Props = {
+                col_1: "select",
+                col_2: "select",
+                col_4: "select",
+                col_5: "select",
+                col_6: "select",
+                sort: true,
+                on_keyup: true,
+                alternate_rows: true,
+                rows_counter: true,
+                rows_counter_text: "Total rows: ",
+                btn_reset: true,
+                btn_reset_text: "Clear all ",
+                loader: true,
+                loader_html: '<img src="<!-- @echo IMAGE_SERVER_URL -->/images/sams/ext/tablefilter/img_loading.gif"/> Filtering data...',
+                display_all_text: " [ Show all ] ",
+                sort_select: true
+            };
+            var tf2 = setFilterGrid("gradetable", gradetable_Props);
+        });
+        function changeGrade() {
+            $('#changeGrade').html("<select name='grade'><option ~[if.~[gpv:gd]=E]selected[/if] value='E'>E<option ~[if.~[gpv:gd]=S]selected[/if] value='S'>S<option ~[if.~[gpv:gd]=N]selected[/if] value='N'>N</select>");
+            $('#matches').html("<input type='hidden' name='minnum' value='1'/>");
+        }
+    });
+    </script>
+    <style>
+        .helpBtn {
+            visibility: hidden;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<script type="text/javascript" src="/scripts/timeentry_widget.js"></script>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.runreports.start_page]</a>
+&gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.runreports.reports]</a> &gt; <a
+        href='/admin/reports/sams.html'>SAMS</a> &gt; Grades Report<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>SAMS</h1>~[SetPostValue:repType=SAMS]
+<h4>
+    <div id='reporttitle'>Current Grades Report</div>
+</h4>
+<!-- Start of shaded content table -->
+<div class="box-round">
+    <center><a href='/admin/reports/sams.html'><img src='<!-- @echo IMAGE_SERVER_URL -->/images/sams/back_button.png' width=15 border=0/> Go Back to
+        Sams</a></center>
+    <form name="gradesform" action="currentgradesreport.html" method="POST">
+        <table border="0" cellspacing="0" cellpadding="4" style='margin: 0 auto; width: 1000px;'>
+
+            <!-- start of drop-down menus coding -->
+            <tr>
+                <td class="bold">Term:
+
+                    <select name="term">
+                        ~[tlist_sql;
+                        SELECT distinct storecode, CASE WHEN storecode = '~[gpv:tm]' THEN 'selected' ELSE '' END
+                        selectedterm
+                        FROM termbins
+                        WHERE yearid = ~(curyearid)
+                        AND schoolid = ~(curschoolid)
+                        ORDER BY storecode]
+                        <option value="~(storecode;t)"
+                        ~(selectedterm,t)>~(storecode;t)
+                        [/tlist_sql]
+                    </select>
+
+                    <select name="grade">
+                        <option
+                        ~[if.~[gpv:gd]=A]selected[/if] value="A">A's
+                        <option
+                        ~[if.~[gpv:gd]=B]selected[/if] value="B">B's
+                        <option
+                        ~[if.~[gpv:gd]=C]selected[/if] value="C">C's
+                        <option
+                        ~[if.~[gpv:gd]=D]selected[/if] value="D">D's
+                        <option
+                        ~[if.~[gpv:gd]=F]selected[/if] value="F">F's
+                        <option value="DsAndFs">D's & F's
+                        <option
+                        ~[if.~[gpv:gd]=I]selected[/if] value="I">I's
+                        <option>--------------
+                        <option
+                        ~[if.~[gpv:gd]=S]selected[/if] value='S'>S (Elem)
+                        <option
+                        ~[if.~[gpv:gd]=E]selected[/if] value='E'>E (Elem)
+                        <option
+                        ~[if.~[gpv:gd]=N]selected[/if] value='N'>N (Elem)
+                    </select>
+                </td>
+                <td>
+                    Advisor:
+                    <select name="advisor">
+                        <option></option>
+                        ~[x:GetDoThisForStudents]
+                        ~[tlist_sql;
+                        SELECT distinct ps_customfields.getSTUDENTScf(students.id, 'advisor')
+                        FROM students
+                        where schoolid=~(curschoolid) and enroll_status=0
+                        and ps_customfields.getSTUDENTScf(students.id, 'advisor') IS NOT NULL]
+                            <option value="~(advisor)">~(advisor)
+                        [/tlist_sql]
+                    </select>
+
+                </td>
+                <td>
+                    Minimum # of Matches:
+                    <select name="minnum">
+                        <option value="1">1
+                        <option
+                        ~[if.~[gpv:mn]=2]selected[/if] value="2">2
+                        <option
+                        ~[if.~[gpv:mn]=3]selected[/if] value="3">3
+                        <option
+                        ~[if.~[gpv:mn]=4]selected[/if] value="4">4
+                        <option
+                        ~[if.~[gpv:mn]=5]selected[/if] value="5">5
+                        <option
+                        ~[if.~[gpv:mn]=6]selected[/if] value="6">6
+                        <option
+                        ~[if.~[gpv:mn]=7]selected[/if] value="7">7
+                        <option
+                        ~[if.~[gpv:mn]=8]selected[/if] value="8">8
+                    </select>
+
+
+                </td>
+                <td>
+                    Maximum # of Matches:
+                    <select name="maxnum">
+                        <option
+                        ~[if.~[gpv:maxn]=1]selected[/if]value="1">1
+                        <option
+                        ~[if.~[gpv:maxn]=2]selected[/if] value="2">2
+                        <option
+                        ~[if.~[gpv:maxn]=3]selected[/if] value="3">3
+                        <option
+                        ~[if.~[gpv:maxn]=4]selected[/if] value="4">4
+                        <option
+                        ~[if.~[gpv:maxn]=5]selected[/if] value="5">5
+                        <option
+                        ~[if.~[gpv:maxn]=6]selected[/if] value="6">6
+                        <option
+                        ~[if.~[gpv:maxn]=7]selected[/if] value="7">7
+                        <option
+                        ~[if.~[gpv:maxn]=8]selected[/if]
+                        ~[if.~[gpv:maxn]=]selected[/if]
+                        value="8">8
+                    </select>
+                </td>
+                <td><input name="choice" type='hidden' value='all'/><input type="image" src="/images/btn_create_on.gif"
+                                                                           width="76" height="28" alt="create"
+                                                                           border="0" id="attSubmitButton"
+                                                                           onClick="actionChange()"></td>
+            </tr>
+            <!-- end of drop-down menus coding -->
+        </table>
+        ~[if.~[gpv:se] = all]
+        <center>
+            <div style='margin: 0 auto'><h3>Click the table headers to sort the data. Type in or use the drop down lists
+                to filter the data.</h3></div>
+        </center>
+        [/if]
+        <span style="width: 100%; display: inline-table;">
+        <table border="0" cellspacing="0" cellpadding="2" align="center" class='tablesorter' id='gradetable' style="width: 100% !important; margin: 0px !important;">
+            <thead>
+            <tr>
+                <th>Student</th>
+                <th>Class</th>
+                <th filter-type='ddl'>Grade</th>
+                <th>Percent&nbsp;&nbsp;</th>
+                <th filter-type='ddl'>Course</th>
+                <th>Exp.</th>
+                <th>Teacher</th>
+                <th>Advisor</th>
+                <th>Last Grade Update</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            ~[x:GetDoThisForStudents]
+            ~[tlist_sql;
+            SELECT s.dcid, s.LastFirst, s.grade_level, pgf.Grade, pgf.Percent, c.Course_Name, sec.Expression,
+            t.LastFirst, ps_customfields.getSTUDENTScf(s.id, 'advisor'), cc.LastGradeUpdate
+            FROM
+            (SELECT pgf.studentid id, count(*)
+            FROM PGFinalGrades pgf
+            INNER JOIN Students s ON pgf.StudentID = s.ID
+            INNER JOIN Sections sec ON pgf.SectionID = sec.ID
+            INNER JOIN CC cc ON pgf.SectionID = cc.SectionID AND pgf.StudentID = cc.StudentID
+            WHERE
+            ~[if.~[gpv:se]=cur]s.id in
+            (~[f.table_info;table=students;dothisfor=currentsel;fn=value;field=id;delim=cma]-1)
+            [else]s.enroll_status = 0 and s.schoolid = ~(curschoolid)[/if]
+            and pgf.FinalGradeName = '~[gpv:tm]'
+            and sec.Termid >= ~(curyearid)00
+            ~[if.~[gpv:gd]=DsAndFs]and pgf.Grade IN ('D+','D','D-','F')
+            [else]
+            and pgf.Grade LIKE '~[gpv:gd]%'
+            [/if]
+            ~[if.~[gpv:advisor]=]
+            [else]
+            and ps_customfields.getSTUDENTScf(s.id, 'advisor')='~[gpv:advisor]'
+            [/if]
+            GROUP BY pgf.studentid
+            HAVING count(*) >= ~[gpv:mn] and count(*) <= ~[gpv:maxn]) lowgrades
+            INNER JOIN Students s ON lowgrades.id = s.id
+            INNER JOIN PGFinalGrades pgf ON s.ID = pgf.StudentID
+            INNER JOIN Sections sec ON pgf.SectionID = sec.ID
+            INNER JOIN Courses c ON upper(sec.Course_Number) = upper(c.Course_Number)
+            INNER JOIN Teachers t ON sec.Teacher = t.ID
+            INNER JOIN CC cc ON pgf.SectionID = cc.SectionID AND pgf.StudentID = cc.StudentID
+
+            WHERE pgf.FinalGradeName = '~[gpv:tm]'
+            and sec.Termid >= ~(curyearid)00
+            ~[if.~[gpv:gd]=DsAndFs]and pgf.Grade IN ('D+','D','D-','F')
+            [else]
+            and pgf.Grade LIKE '~[gpv:gd]%'
+            [/if]
+
+            ;alternatecolor]
+
+            <tr>
+                <td><a target="_blank" href="/admin/students/home.html?frn=001~(s.dcid)">~(s.LastFirst;t)</a>&nbsp;&nbsp;&nbsp;
+                </td>
+                <td>~(s.grade_level;t)</td>
+                <td>~(pgf.Grade;t)</td>
+                <td>~(pgf.Percent;l)</td>
+                <td>~(c.Course_Name;t)&nbsp;&nbsp;&nbsp;</td>
+                <td>~(sec.Expression;t)&nbsp;&nbsp;&nbsp;</td>
+                <td>~(t.Teacher;t)&nbsp;&nbsp;&nbsp;</td>
+                <td>~(Advisor)&nbsp;&nbsp;&nbsp;</td>
+                <td>~(cc.LastGradeUpdate;d)</td>
+            </tr>
+
+            [/tlist_sql]
+            </tbody>
+        </table>
+        </span>
+
+        <p>
+        <center>Report generated at ~[time] on ~[date]</center>
+        <p>
+
+            </td>
+            </tr>
+            </table>
+    </form>
+</div>
+<!-- End of shaded content table -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html>

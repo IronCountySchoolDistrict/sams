@@ -1,0 +1,16 @@
+<script type="text/template" id="current-grades-template">
+    <tr class="hiddenRow level_1 hidecount_1 nochildren">
+        <td>
+            <a href="/admin/reports/sams/grades/currentgradesreport.html" style="margin-left: 28px;">Current Grades Report</a>
+        </td>
+        <td>Search for current student grades by quarter. Select a function for this group of students.</td>
+    </tr>
+</script>
+
+<script>
+    (function() {
+        var template = $j($j('#current-grades-template').html());
+        var selectInsert = $j('#grpGrades');
+        template.insertAfter(selectInsert);
+    }());
+</script>
