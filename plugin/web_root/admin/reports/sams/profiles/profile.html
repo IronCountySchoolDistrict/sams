@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<head>
+<title>SAMS - Profile Builder</title>
+~[wc:commonscripts]
+<link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
+<link href="<!-- @echo IMAGE_SERVER_URL -->/sams/tablesorter/blue/style.css"
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/tablesorter/tablesorter.min.js"></script>
+
+<script type='text/javascript'>
+require(['jquery', 'jquery.cookie'], function($) {
+    'use strict';
+    $(document).ready(function () {
+
+        ~[wc:sams]
+        var authkey = $('#key').val();
+        if ($.cookie('reporttype') == 's' || $.cookie('reporttype') == 'g') {
+            $.cookie('reporttype', 'd');
+            $.cookie('resumereport', 'false');
+        }
+        var url = "at=" + authkey + "&reporttype=" + $.cookie('reporttype') + "&school=~(schoolid)&schoolid=" + $.cookie('school');
+        $.ajax({
+            dataType: 'jsonp',
+            data: url,
+            jsonp: 'jsonp_callback',
+            timeout: 3000,
+            url: samsLocation + "/Assessment/profile/reportbuilder.php",
+            success: function (msg) {
+                $("#reportbuilder").html(msg);
+
+                $('#grades').hide();
+                $('#teachers').hide();
+                $('#classes').hide();
+                $('#years').hide();
+                $('#terms').hide();
+                $('#reporttype').show();
+
+                if ($.cookie('resumereport') == "true" && $.cookie('reporttype') == "t") {
+
+                    $('#teachers').show();
+                    $('#schools').show();
+                    $('#grades').hide();
+                    $('#reporttype').show();
+                    $('#reporttypetext').html('Teachers Profile');
+                    $.cookie('reporttype', 't');
+                    $('#reportcontent').html("<div id=''><input style='border: none; width: 150px; height: 27px;' type='image' src='/images/btn_resume_teacher_report.gif' alt='submit' id='resumeteacherreportbutton'/></div>");
+
+                    populateSchools();
+                    $('#resumeteacherreportbutton').click(function () {
+                        SubmitReport();
+                    });
+                }
+                else {
+
+                    $.cookie('reporttype', 'd');
+                    $.cookie('resumereport', "false");
+                    $('#schools').hide();
+                    $('#reporttype').show();
+                    $('#reporttypetext').html('District Profile');
+                }
+                $("#datatable").tablesorter({widthFixed: true, widgets: ['zebra']});
+                $('#reportbuilderreset').click(function () {
+                    //remove the cookies
+                    $.cookie('school', '');
+                    $.cookie('reporttype', '');
+                    $.cookie('grade', '');
+                    $.cookie('teacherid', '');
+                    $.cookie('resumereport', 'false');
+                    //reload the website.
+                    window.location.reload();
+                });
+
+
+                $('#crt_pop_dialog').dialog({ autoOpen: false, buttons: { 'Close': function () {
+                    $(this).dialog("close");
+                } }});
+                $('#crt_pop_dialog').dialog({
+                    modal: true,
+                    title: '',
+                    resizable: true,
+                    autoOpen: false,
+                    position: 'center',
+                    width: 650,
+                    buttons: {
+                        Close: function () {
+                            closeCRT_POP();
+                        }
+                    }
+                });
+
+
+                $("#reporttype").change(function () { //Report Type Change
+                    var fileref = document.createElement('script');
+                    fileref.setAttribute("type", "text/javascript");
+                    fileref.setAttribute("src", "/scripts/SamsProfilesProfile/jquery_cookies.js");
+                    if ($('#reporttype :selected').val() == "d") //District
+                    {
+                        $('#reporttype').show();
+                        $('#reporttypetext').html('District Profile');
+                        $('#schools').hide();
+                        $('#grades').hide();
+                        $('#teachers').hide();
+                        $('#classes').hide();
+                        $('#years').hide();
+                        $('#terms').hide();
+                        $.cookie('reporttype', 'd');
+                    }
+                    if ($('#reporttype :selected').val() == "s") //School
+                    {
+                        $('#schools').show();
+                        $('#teachers').hide();
+                        $('#grades').hide();
+                        $('#reporttype').show();
+                        $('#reporttypetext').html('School Profile');
+                        $.cookie('reporttype', 's');
+                    }
+                    if ($('#reporttype :selected').val() == "g") //Grade Level
+                    {
+                        $('#teachers').hide();
+                        $('#grades').show();
+                        $('#schools').show();
+                        $('#reporttype').show();
+                        $('#reporttypetext').html('Grade Level Profile');
+                        $.cookie('reporttype', 'g');
+                    }
+                    if ($('#reporttype :selected').val() == "t") //Teacher
+                    {
+
+                        $('#schools').show();
+                        populateSchools();
+                        $('#teachers').show();
+                        $('#grades').hide();
+                        $('#reporttype').show();
+                        $('#reporttypetext').html('Teachers Profile');
+                        $.cookie('reporttype', 't');
+                    }
+                });
+                //Schools Button Changes Grades and Teacher
+                $("#schools").change(function () { //IF SCHOOL IS SELECTED
+                    populateSchools();
+                })
+                $("#grades").change(function () {
+                    $('#reporttypetext').html('Grade Level Profile');
+                    $.cookie('grade', $('#grades :selected').val());
+                });
+                $("#teachers").change(function () { //IF Teachers IS SELECTED
+                    //populateTeachers();
+                    $.cookie('teacherid', $('#teachers :selected').val());
+                });
+
+                $('#submitbutton').click(function () {  //Submit The REPORT
+                    $.getScript('/scripts/SamsProfilesProfile/jquery_cookies.js', function () {
+                        $.cookie('resumereport', 'true');
+                        SubmitReport();
+                    })
+                });
+            },
+            error: function(jqXHR, status) {
+                $('#reportbuilder').html('<div>Unable to load report builder.</div>');
+                $('#reportcontent').remove();
+            }
+        });
+        // end .ajax call
+
+        if ($.cookie('resumereport') == "true") {
+        }
+        else {
+            var url = "at=" + authkey + '&termid=~(termid)';
+            $.ajax({
+                dataType: 'jsonp',
+                data: url,
+                jsonp: 'jsonp_callback',
+                timeout: 3000,
+                url: samsLocation + "/Assessment/profile/profileDistrict.php",
+                success: function (msg) {
+
+                    $("#reportcontent").html(msg);
+                    $('.school_click').click(function () {
+                        var school = ($(this).attr("id"));
+                        $('#reportcontent').html("<div>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/></div>");
+                        $('#reporttype').show();
+                        $('#reporttypetext').html('School Profile');
+                        ~[wc:sams]
+                        $.ajax({
+                            dataType: 'jsonp',
+                            data: 'reporttype=s&schoolp=' + school + '&at=' + $('#key').val() + '&yearid=~(yearid)',
+                            jsonp: 'jsonp_callback',
+                            timeout: 1000,
+                            url: samsLocation + '/Assessment/profile/post.php',
+                            success: function (msg) {
+                                $("#reportcontent").html(msg);
+                                $("#datatable").tablesorter({widthFixed: true, widgets: ['zebra']});
+                                $("#datatable1").tablesorter({widthFixed: true, widgets: ['zebra']});
+                                $("#datatable2").tablesorter({widthFixed: true, widgets: ['zebra']});
+                                $("#datatable3").tablesorter({widthFixed: true, widgets: ['zebra']});
+                                $("#schools").val(school).attr('selected', true);
+                                $("#reporttype").val('s').attr('selected', true);
+                                $('#schools').show();
+                            }
+                        });
+                        return false;
+                    });
+                },
+                error: function(jqXHR, status) {
+                    $('#reportcontent').html('<div>Unable to load report.</div>');
+                    $('#reportbuilder').remove();
+                }
+            });
+        }
+        ;
+    });
+
+    function populateTeachers() {
+        //$('#classes').show();
+        //$('#years').show();
+        //$('#terms').show();
+        ~[wc:sams]
+        $('#reporttypetext').html('Teachers Profile');
+        var post = $('#schools :selected').val();
+        //var post = $('#grades :selected').val();
+        //var post = $('#teachers :selected').val();
+        //Class Update
+        $('#grades').children().remove().end().append('<option selected value="none">Grades</option><option value="all">All Grades</option>');
+        $.ajax({
+            dataType: 'jsonp',
+            data: 'school=' + post + '&gradesonly=1&at=' + $('#key').val() + '&yearid=~(yearid)',
+            jsonp: 'jsonp_callback',
+            url: samsLocation + '/Assessment/profile/post.php',
+            success: function (msg) {
+                var select = $('#class');
+                $.each(msg, function (k, v) {
+                    var option = $('<option />');
+                    option.attr('value', v)
+                            .html(v)
+                            .appendTo('#grades');
+                });
+            }
+        });
+        //Years Update
+        $('#teachers').children().remove().end().append('<option selected value="none">Pick A Teacher</option>');
+        $.ajax({
+            dataType: 'jsonp',
+            data: 'school=' + post + '&teachersonly=1&at=' + $('#key').val() + '&yearid=~(yearid)&teacherid=' + $.cookie('teacherid'),
+            jsonp: 'jsonp_callback',
+            url: samsLocation + '/Assessment/profile/post.php',
+            success: function (msg) {
+                var select = $('#years');
+                $.each(msg, function (k, v) {
+                    var option = $('<option />');
+                    option.attr('value', v)
+                            .html(v)
+                            .appendTo('#teachers');
+                });
+            }
+
+        });
+        //Terms Update
+        $('#teachers').children().remove().end().append('<option selected value="none">Pick a Teacher</option>');
+        $.ajax({
+            dataType: 'jsonp',
+            data: 'school=' + post + '&teachersonly=1&at=' + $('#key').val() + '&yearid=~(yearid)',
+            jsonp: 'jsonp_callback',
+            url: samsLocation + '/Assessment/profile/post.php',
+            success: function (msg) {
+                var select = $('#terms');
+                $.each(msg, function (k, v) {
+                    var option = $('<option />');
+                    option.attr('value', v)
+                            .html(v)
+                            .appendTo('#teachers');
+                });
+            }
+        });
+    }
+    ;
+    function populateSchools() {
+        ~[wc:sams]
+        var post = $('#schools :selected').val();
+        $.cookie('school', post);
+        $('#grades').children().remove().end().append('<option value="none">Grade Level</option><option value="all">All Grades</option>');
+        $.ajax({
+            dataType: 'jsonp',
+            data: 'school=' + post + '&at=' + $('#key').val() + '&yearid=~(yearid)&gradesonly=1&schoolid=' + $.cookie('school'),
+            jsonp: 'jsonp_callback',
+            url: samsLocation + '/Assessment/profile/post.php',
+            success: function (msg) {
+                var select = $('#grades');
+                $.each(msg, function (k, v) {
+                    var option = $('<option />');
+                    option.attr('value', v)
+                            .html(v)
+                            .appendTo('#grades');
+                });
+            }
+        });
+        $('#teachers').children().remove().end().append('<option value="none">Pick A Teacher</option>');
+        $.ajax({
+            dataType: 'jsonp',
+            data: 'school=' + post + '&teachersonly=1&at=' + $('#key').val() + '&yearid=~(yearid)&teacherid=' + $.cookie('teacherid'),
+            jsonp: 'jsonp_callback',
+            url: samsLocation + '/Assessment/profile/post.php',
+            success: function (msg) {
+                var select = $('#teachers');
+                $.each(msg, function (k, v) {
+                    $('#teachers').append(v);
+                });
+            }
+        });
+    }
+
+    function SubmitReport() {
+        ~[wc:sams]
+        if ($.cookie('school') == '') {
+            var school = $('#schools :selected').val();
+        }
+        else {
+            var school = $.cookie('school');//$('#schools :selected').val();
+        }
+        var grade = $.cookie('grade');
+        var teacherid = $.cookie('teacherid');
+        var classes = $('#schools :selected').val();
+        var year = ~(yearid);
+        var term = ~(termid);
+        var lowincome = $('#lowincome').attr('checked');
+        var speced = $('#speced').attr('checked');
+        var esl = $('#esl').attr('checked');
+        var reporttype = $.cookie('reporttype');
+
+        $('#reportcontent').html("<div>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/></div>");
+        var dataString = '';
+        if (reporttype == 'd') //School Query
+        {
+            $.cookie('school', '');
+            $.cookie('reporttype', '');
+            $.cookie('grade', '');
+            $.cookie('teacherid', '');
+            $.cookie('resumereport', 'false');
+            //reload the website.
+            window.location.reload();
+        }
+        if (reporttype == 's') //School Query
+        {
+            dataString = "reporttype=s&schoolp=" + school + "&lowincome=" + lowincome + "&speced=" + speced + "&esl=" + esl + "&at=" + $('#key').val() + "&yearid=~(yearid)";
+        }
+        else if (reporttype == 't') //Teacher Query
+        {
+            var reportingDistrict = [
+                ~[tlist_sql;
+                    select value from prefs where name='districtname';
+                ]
+                    '~(value)'
+                [/tlist_sql]
+            ];
+            dataString = "reporttype=t&schoolp=" + school + "&at=" + $('#key').val() + "&lowincome=" + lowincome + "&speced=" + speced + "&esl=" + esl + "&yearid=~(yearid)&teacherid=" + teacherid + "&abbreviation=~(termid)" + "&reportingDistrict=" + reportingDistrict;
+        }
+        else if (reporttype == 'g') //Grade Query
+        {
+            dataString = "reporttype=g&schoolp=" + school + "&at=" + $('#key').val() + "&yearid=~(yearid)&lowincome=" + lowincome + "&speced=" + speced + "&esl=" + esl + "&gradelevel=" + grade;
+        }
+        $.ajax({
+            dataType: 'jsonp',
+            data: dataString,
+            jsonp: 'jsonp_callback',
+            url: samsLocation + '/Assessment/profile/post.php',
+            success: function (msg) {
+
+                $("#reportcontent").html(msg);
+                $("#datatable").tablesorter({widthFixed: true, widgets: ['zebra']});
+                $("#datatable1").tablesorter({widthFixed: true, widgets: ['zebra']});
+                $("#datatable2").tablesorter({widthFixed: true, widgets: ['zebra']});
+                $("#datatable3").tablesorter({widthFixed: true, widgets: ['zebra']});
+                $('.crt_pop').click(function () {
+                    $.ajax({
+                        dataType: 'jsonp',
+                        jsonp: 'jsonp_callback',
+                        url: $(this).attr('alt'),
+                        success: function (msg) {
+                            $('#crt_pop_dialog').html("<center>" + msg + "</center>");
+                            $crt_pop_dialog.show();
+                            $crt_pop_dialog.dialog("open");
+                        }
+                    });
+                });
+            }
+        });
+        return false;
+    }
+    ;
+    //function to close dialog, probably called by a button in the dialog
+    var closeCRT_POP = function () {
+        $('#crt_pop_dialog').dialog("close");
+        $.getScript('/scripts/SamsProfilesProfile/jquery_cookies.js');
+        $.getScript('/scripts/tablesorter/tablesorter.min.js');
+    };
+});
+</script>
+<style>
+    .helpBtn {
+        visibility: hidden;
+    }
+
+    #reportbuildcontainer {
+        width: 650px;
+
+    }
+</style>
+</head>
+
+
+<body>
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.runreports.start_page]</a>
+&gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.runreports.reports]</a> &gt; <a
+        href='/admin/reports/sams.html'>Sams</a> &gt; Profile Builder<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>Profile Report</h1>
+
+<div id='crt_pop_dialog'></div>
+
+
+<!-- start of content and bounding box -->
+<div class="box-round">
+    <br><br>
+    <!-- end of title -->
+
+
+    ~[tlist_sql;
+    select
+    psid
+    from
+    logins
+    where
+    userid = ~[x:userid] and dcid = (select max(dcid) from logins where userid=~[x:userid]);]
+    <form name='form'>
+        <input type="hidden" id='key' name="at" value="~(authkey)">
+    </form>
+    [/tlist_sql]
+    <center><span id='reportbuilder'><div>Loading Report Builder......Please Wait.<br><br><img
+            src='/images/loading.gif'/></div></span></center>
+
+
+    <!-- start of content and bounding box -->
+    <div style='padding: 5px 5px;'>
+        <div id='csvimage'></div>
+        ~[tlist_sql;
+        select
+        psid
+        from
+        logins
+        where
+        userid = ~[x:userid] and dcid = (select max(dcid) from logins where userid=~[x:userid]);]
+        <form name='form'>
+            <input type="hidden" id='key2' name="at2" value="~(authkey)">
+        </form>
+        [/tlist_sql]
+        <center><span id='reportcontent' style="width: 100%; display: inline-table;"><div>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/>
+        </div></span></center>
+    </div>
+    <br>
+    <!-- end of content of bounding box -->
+
+    ~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

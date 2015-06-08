@@ -4,7 +4,7 @@
         // SAMS Button
         var searches = $j('.searchButtons');
         var lastSearch = searches[searches.length - 1];
-        var htmlsrc = $j("<a id='sams-btn' href='/admin/reports/sams.html'><img src='<!-- @echo IMAGE_SERVER_URL -->/images/sams/samsbutton.png' border=0/></a>");
+        var htmlsrc = $j("<a id='sams-btn' href='/admin/reports/sams.html'><img src='<!-- @echo IMAGE_SERVER_URL -->/sams/images/samsbutton.png' border=0/></a>");
         htmlsrc.insertAfter(lastSearch);
         htmlsrc.css('padding-left', '10px');
     });

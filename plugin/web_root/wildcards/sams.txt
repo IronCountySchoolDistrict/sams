@@ -1,7 +1,1 @@
-var debug = true;
-var samsLocation;
-if (debug) {
-    samsLocation = 'https://samstest.irondistrict.org/psscripts/';
-} else {
-    samsLocation = 'https://sams.irondistrict.org/psscripts/';
-}
+var samsLocation = "<!-- @echo SAMS_URL -->";
