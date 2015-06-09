@@ -4,17 +4,35 @@
 <head>
 <title>SAMS - Profile Builder</title>
 ~[wc:commonscripts]
+<!-- Default CSS imports -->
 <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/screen.css" rel="stylesheet" media="screen">
 <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
-<link href="<!-- @echo IMAGE_SERVER_URL -->/sams/tablesorter/blue/style.css"
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/tablesorter/tablesorter.min.js"></script>
+
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/js/jquery_cookies.js"></script>
+
+<!-- tablesorter imports -->
+<link href="<!-- @echo IMAGE_SERVER_URL -->/sams/tablesorter/blue/style.css">
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/tablesorter/jquery.tablesorter.js"></script>
+
+<!-- TableFilter imports -->
+<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/filtergrid.css" type="text/css">
+<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/tablefilter_all.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/sortabletable.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/tfAdapter.sortabletable.js"></script>
+
+<!-- fusioncharts imports -->
+<script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/fusioncharts/FusionCharts.js'></script>
+<script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/fusioncharts/highcharts.js'></script>
+<script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/fusioncharts/FusionChartsExportComponent.js'></script>
+
 
 <script type='text/javascript'>
-require(['jquery', 'jquery.cookie'], function($) {
-    'use strict';
+    var $ = jQuery;
+    ~[wc:sams]
     $(document).ready(function () {
-
-        ~[wc:sams]
+        "use strict";
+        
         var authkey = $('#key').val();
         if ($.cookie('reporttype') == 's' || $.cookie('reporttype') == 'g') {
             $.cookie('reporttype', 'd');
@@ -182,7 +200,6 @@ require(['jquery', 'jquery.cookie'], function($) {
                         $('#reportcontent').html("<div>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/></div>");
                         $('#reporttype').show();
                         $('#reporttypetext').html('School Profile');
-                        ~[wc:sams]
                         $.ajax({
                             dataType: 'jsonp',
                             data: 'reporttype=s&schoolp=' + school + '&at=' + $('#key').val() + '&yearid=~(yearid)',
@@ -216,7 +233,6 @@ require(['jquery', 'jquery.cookie'], function($) {
         //$('#classes').show();
         //$('#years').show();
         //$('#terms').show();
-        ~[wc:sams]
         $('#reporttypetext').html('Teachers Profile');
         var post = $('#schools :selected').val();
         //var post = $('#grades :selected').val();
@@ -276,7 +292,6 @@ require(['jquery', 'jquery.cookie'], function($) {
     }
     ;
     function populateSchools() {
-        ~[wc:sams]
         var post = $('#schools :selected').val();
         $.cookie('school', post);
         $('#grades').children().remove().end().append('<option value="none">Grade Level</option><option value="all">All Grades</option>');
@@ -311,7 +326,6 @@ require(['jquery', 'jquery.cookie'], function($) {
     }
 
     function SubmitReport() {
-        ~[wc:sams]
         if ($.cookie('school') == '') {
             var school = $('#schools :selected').val();
         }
@@ -394,7 +408,6 @@ require(['jquery', 'jquery.cookie'], function($) {
         $.getScript('/scripts/SamsProfilesProfile/jquery_cookies.js');
         $.getScript('/scripts/tablesorter/tablesorter.min.js');
     };
-});
 </script>
 <style>
     .helpBtn {
