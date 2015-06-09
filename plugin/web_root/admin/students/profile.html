@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<!-- start right frame -->
+<head>
+    <title>Student Profile</title>
+    ~[wc:commonscripts]
+    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="/images/css/print.css" rel="stylesheet" media="print">
+    <script type="text/javascript" src="/scripts/SamsStudentProfile/showPopup.js"></script>
+    <script type="text/javascript" src="/scripts/SamsStudentProfile/PS_Secure.js"></script>
+    <script type='text/javascript' src='/scripts/SamsStudentProfile/samscookies.js'></script>
+    <script type="text/javascript">
+        var $ = jQuery.noConflict();
+        $(document).ready(function () {
+            $('#returnlink').click(function () {
+                if ($(this).attr('alt') == 'assessmentsummary' || $(this).attr('alt') == 'crttogpa' || $(this).attr('alt') == 'crtforclass' || $(this).attr('alt') == 'crtyeartoyear' || $(this).attr('alt') == 'crtselectedprofile') {
+                    setCookie("returntype", $(this).attr('alt'), 365);
+                    window.parent.location = '/admin/reports/sams.html';
+                }
+            });
+        });
+    </script>
+    <script language="JavaScript">
+        var $ = jQuery.noConflict();
+        $(document).ready(function () {
+            'use strict';
+            var loader = $('#loader');
+            loader.html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='<!-- @echo IMAGE_SERVER_URL -->/sams/images/img_loading.gif'/></div>");
+            loader.show();
+            var authkey = $('#seckey').val();
+            var url = "studentnum=~([Students]Student_Number)&at=" + authkey + "&schoolnum=~(gpv.schoolnum)&abbreviation=~(gpv.abbreviation)&setyear=~(termid)&yearid=~(gpv.yearid)&teacherid=~(gpv.teacherid)&return=~(gpv.return)&all=~(gpv.all)";
+            ~[wc:sams]
+            $.ajax({
+                dataType: 'jsonp',
+                data: url,
+                jsonp: 'jsonp_callback',
+                timeout: 3000,
+                url: samsLocation + "Assessment/student_profile/profile2.php",
+                success: function (msg) {
+                    $('#loader').hide();
+                    $("#reporttable").html(msg);
+                    var $crt_pop_dialog = $('#crt_pop_dialog');
+                    $crt_pop_dialog.dialog({
+                        modal: false,
+                        title: '',
+                        resizable: true,
+                        autoOpen: false,
+                        position: 'center',
+                        width: 650,
+                        buttons: {
+                            Close: function () {
+                                closeCRT_POP();
+                            }
+                        }
+                    });
+                    $('.crt_pop').on('click', function () {
+                        $.ajax({
+                            dataType: 'jsonp',
+                            jsonp: 'jsonp_callback',
+                            url: $(this).attr('alt'),
+                            success: function (msg) {
+                                $('#crt_pop_dialog').html("<center>" + msg + "</center>");
+                                $crt_pop_dialog.show();
+                                $crt_pop_dialog.dialog('open');
+                            }
+                        })
+                    });
+                    var closeCRT_POP = function () {
+                        $crt_pop_dialog.dialog('close');
+                    }
+                },
+                error: function(jqXHR, status) {
+                    $('#loader').hide();
+                    $('#reporttable').html('Unable to load SAMS profile');
+                    $('#reporttable').css({'text-align': 'center'});
+                }
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+
+~[wc:admin_header_frame_css]<!-- breadcrumb start -->
+<a href="/admin/home.html" target="_top">~[text:psx.html.admin_students.addresses.start_page]</a> &gt;
+<a href="home.html?selectstudent=nosearch" target="_top">~[text:psx.html.admin_students.addresses.student_selection]</a>
+&gt; <a href='/admin/reports/sams.html' target='_top'>SAMS</a> &gt; Student Profile<!-- breadcrumb end -->
+~[wc:admin_navigation_frame_css]
+<br>
+
+<div class="box-round">
+    ~[tlist_sql;
+    select
+    psid
+    from
+    logins
+    where
+    userid = ~[x:userid] and dcid = (select max(dcid) from logins where userid=~[x:userid]);]
+    <form name='form'>
+
+        <input type="hidden" name="at" id='seckey' value="~(authkey)">
+    </form>
+    [/tlist_sql]
+    <center><span id='loader'>Load...Please Wait...<br><img src='/images/loading.gif'/></span></center>
+    <div id='reporttable'></div>
+
+
+</div>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_frame_css]
+
+</body>
+</html><!-- non framed -->
+

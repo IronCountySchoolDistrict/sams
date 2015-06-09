@@ -169,10 +169,8 @@
                 });
 
                 $('#submitbutton').click(function () {  //Submit The REPORT
-                    $.getScript('/scripts/SamsProfilesProfile/jquery_cookies.js', function () {
-                        $.cookie('resumereport', 'true');
-                        SubmitReport();
-                    })
+                    $.cookie('resumereport', 'true');
+                    SubmitReport();
                 });
             },
             error: function(jqXHR, status) {
@@ -405,8 +403,6 @@
     //function to close dialog, probably called by a button in the dialog
     var closeCRT_POP = function () {
         $('#crt_pop_dialog').dialog("close");
-        $.getScript('/scripts/SamsProfilesProfile/jquery_cookies.js');
-        $.getScript('/scripts/tablesorter/tablesorter.min.js');
     };
 </script>
 <style>
