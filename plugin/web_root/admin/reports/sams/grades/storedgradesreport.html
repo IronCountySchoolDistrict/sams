@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAMS - Stored Grades</title>
+    ~[wc:commonscripts]
+    <!-- Default CSS imports -->
+    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
+
+    <!-- TableFilter imports -->
+    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/filtergrid.css" type="text/css">
+    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tablefilter_all.js"></script>
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/sortabletable.js"></script>
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+
+    <script>
+        function actionChange() {
+            document.gradesform.action = 'storedgradesreport.html?term=' + document.gradesform.termchoice.value + '&grade=' + document.gradesform.gradechoice.value + '&which=' + document.gradesform.allgrades.value + '&level=' + document.gradesform.gradelevel.value + '&sort=' + document.gradesform.sortchoice.value;
+        }
+
+        var $ = jQuery.noConflict();
+        $(document).ready(function () {
+            'use strict';
+            var gradetable_Props = {
+                base_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/",
+                themes_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/", 
+                col_1: "select",
+                col_2: "select",
+                col_4: "select",
+                col_5: "select",
+                col_6: "select",
+                sort: true,
+                on_keyup: true,
+                alternate_rows: true,
+                rows_counter: true,
+                rows_counter_text: "Total rows: ",
+                btn_reset: true,
+                btn_reset_text: "Clear all ",
+                loader: true,
+                loader_html: '<img src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/Default/images/img_loading.gif"/> Filtering data...',
+                display_all_text: " [ Show all ] ",
+                sort_select: true
+            };
+            var tf2 = setFilterGrid("gradetable", gradetable_Props);
+            $('#inf_gradetable,.tablesorter').wrapAll('<div id=tablewrapper><\/div>');
+            $('#tablewrapper').css({
+                display: 'inline-table',
+                width: '100%'
+            });
+        });
+    </script>
+    <style>
+        .helpBtn {
+            visibility: hidden;
+        }
+
+
+    </style>
+</head>
+
+<body>
+
+<script type="text/javascript" src="/scripts/timeentry_widget.js"></script>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.runreports.start_page]</a>
+&gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.runreports.reports]</a> &gt; <a
+        href='/admin/reports/sams.html'>SAMS</a> &gt; Stored Grades Report<!-- breadcrumb end -->
+~[wc:admin_navigation_css]
+
+<h1>SAMS</h1>~[SetPostValue:repType=SAMS]
+~[x:insertfile;reporttabs.html]
+<h4>
+    <div id='reporttitle'>Stored Grades Report - ~[gpv:term] ~(decode;~[gpv:grade];DsAndFs;, D's and F's;Ds;, D's;Fs;,
+        F's;Is;, I's;; ) ~(decode;~[gpv:which];All;, All Grade Levels;EQ;, Grade Level = ~[gpv:level];GTE;, Grade Level
+        >= ~[gpv:level];LTE;, Grade Level <= ~[gpv:level];; ) ~(decode;~[gpv:sort];S;, Sorted by Student;T;, Sorted by
+        Teacher;C;, Sorted by Course;E;, Sorted by Expression;P;, Sorted by Perecent;; )
+    </div>
+</h4>
+<!-- Start of shaded content table -->
+<div class="box-round">
+    <center>
+        <a href='/admin/reports/sams.html'>
+            <img src='<!-- @echo IMAGE_SERVER_URL -->/sams/images/back_button.png' width=15 border='0'/> Go Back to Sams</a>
+    </center>
+
+    <center>Choose from the options below and click on Create. If All Grades is chosen for class, the grade level choice
+        is ignored.
+    </center>
+    <form name="gradesform" action="storedgradesreport.html" method="POST">
+        <table border="0" cellspacing="0" cellpadding="2" style='margin: 0 auto; width: 800px;'>
+            <!-- start of drop-down menus coding -->
+            <tr>
+                <td class="bold">Term:</td>
+                <td>
+                    <select name="termchoice">
+                        ~[tlist_sql;
+                        SELECT distinct storecode, CASE WHEN storecode = '~[gpv:term]' THEN 'selected' ELSE '' END
+                        selectedterm
+                        FROM termbins
+                        WHERE yearid = ~(curyearid)
+                        AND schoolid = ~(curschoolid)
+                        ORDER BY storecode]
+                        <option value="~(storecode;t)"
+                        ~(selectedterm,t)>~(storecode;t)
+                        [/tlist_sql]
+                    </select>
+                </td>
+                <td class="bold">Grades:</td>
+                <td><select name="gradechoice">
+                    <option value="DsAndFs">D's & F's
+                    <option
+                    ~[if.~[gpv:grade]=Ds]selected[/if] value="Ds">Only D's
+                    <option
+                    ~[if.~[gpv:grade]=Fs]selected[/if] value="Fs">Only F's
+                    <option
+                    ~[if.~[gpv:grade]=Is]selected[/if] value="Is">Only I's
+                </select></td>
+                <td class="bold">Class:</td>
+                <td><select name="allgrades">
+                    <option value="All">All Grades
+                    <option
+                    ~[if.~[gpv:which]=EQ]selected[/if] value="EQ">Grade Level =
+                    <option
+                    ~[if.~[gpv:which]=GTE]selected[/if] value="GTE">Grade Level >=
+                    <option
+                    ~[if.~[gpv:which]=LTE]selected[/if] value="LTE">Grade Level <=
+                </select></td>
+                <td>~[custompopup;name=gradelevel;list=gradelevels;default=~[gpv:level]]</td>
+                <td class="bold">Sort By:</td>
+                <td><select name="sortchoice">
+                    <option value="S">Student
+                    <option
+                    ~[if.~[gpv:sort]=T]selected[/if] value="T">Teacher
+                    <option
+                    ~[if.~[gpv:sort]=C]selected[/if] value="C">Course
+                    <option
+                    ~[if.~[gpv:sort]=E]selected[/if] value="E">Expression
+                    <option
+                    ~[if.~[gpv:sort]=P]selected[/if] value="P">Percent
+                </select></td>
+                <td><input name="choice" type='hidden' value='all'><input type="image" src="/images/btn_create_on.gif"
+                                                                          width="76" height="28" alt="create" border="0"
+                                                                          id="attSubmitButton" onClick="actionChange()">
+                </td>
+            </tr>
+            <!-- end of drop-down menus coding -->
+        </table>
+
+
+        <br>
+        <!-- end of content of bounding box -->
+    </form>
+    <p>
+
+        ~[if.~[gpv:se] = all]
+    <center>
+        <div style='margin: 0 auto'><h3>Click the table headers to sort the data. Type in or use the drop down lists to
+            filter the data.</h3></div>
+    </center>
+    [/if]
+    <!-- Start of shaded content table for current grades -->
+    <table border="0" cellspacing="0" cellpadding="2" align="center" class='tablesorter' id='gradetable' style="width: 100% !important; margin: 0px !important;">
+        <thead>
+        <tr>
+            <th class="bold">Student</th>
+            <th class="bold">Class</th>
+            <th class="bold">Grade</th>
+            <th class="bold">Percent&nbsp;&nbsp;</th>
+            <th class="bold">Course</th>
+            <th class="bold">Exp.</th>
+            <th class="bold">Teacher</th>
+            <th class="bold">Date Stored</th>
+        </tr>
+        </thead>
+        <tbody>
+        ~[tlist_sql;
+        SELECT s.LastFirst, sg.grade_level, sg.Grade, sg.Percent, sg.Course_Name, sec.Expression, sg.Teacher_Name,
+        sg.DateStored
+
+        FROM StoredGrades sg
+        INNER JOIN Students s ON sg.StudentID = s.ID
+        INNER JOIN Sections sec ON sg.SectionID = sec.ID
+
+        WHERE s.enroll_status = 0
+        and sg.schoolid = ~(curschoolid)
+        and sg.StoreCode = '~[gpv:term]'
+        and sg.Termid >= ~(curyearid)00
+        ~[if.~[gpv:which]=EQ]and s.Grade_Level = ~[gpv:level][/if]
+        ~[if.~[gpv:which]=GTE]and s.Grade_Level >= ~[gpv:level][/if]
+        ~[if.~[gpv:which]=LTE]and s.Grade_Level <= ~[gpv:level][/if]
+        ~[if.~[gpv:grade]=DsAndFs]and sg.Grade IN ('D+','D','D-','F')[/if]
+        ~[if.~[gpv:grade]=Ds]and sg.Grade LIKE 'D%'[/if]
+        ~[if.~[gpv:grade]=Fs]and sg.Grade LIKE 'F%'[/if]
+        ~[if.~[gpv:grade]=Is]and sg.Grade LIKE 'I%'[/if]
+
+
+        ORDER BY
+        ~[if.~[gpv:sort]=S]lower(s.lastfirst), sec.expression[/if]
+        ~[if.~[gpv:sort]=t]lower(sg.Teacher_Name), sec.expression, lower(s.lastfirst)[/if]
+        ~[if.~[gpv:sort]=c]lower(sg.course_name), sec.expression, lower(s.lastfirst)[/if]
+        ~[if.~[gpv:sort]=e]sec.expression, lower(sg.course_name), lower(s.lastfirst)[/if]
+        ~[if.~[gpv:sort]=p]sg.percent, lower(s.lastfirst)[/if]
+
+        ;alternatecolor]
+
+        <tr>
+            <td>~(s.LastFirst;t)&nbsp;&nbsp;&nbsp;</td>
+            <td>~(sg.grade_level;t)</td>
+            <td>~(sg.Grade;t)</td>
+            <td>~(sg.Percent;l)</td>
+            <td>~(sg.Course_Name;t)&nbsp;&nbsp;&nbsp;</td>
+            <td>~(sec.Expression;t)&nbsp;&nbsp;&nbsp;</td>
+            <td>~(sg.Teacher_Name;t)&nbsp;&nbsp;&nbsp;</td>
+            <td>~(sg.DateStored;d)</td>
+        </tr>
+        [/tlist_sql]
+        </tbody>
+    </table>
+
+
+    <p>
+    <center>Report generated at ~[time] on ~[date]</center>
+    <p>
+
+        </td>
+        </tr>
+        </table>
+        </form>
+</div>
+<!-- End of shaded content table -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html>

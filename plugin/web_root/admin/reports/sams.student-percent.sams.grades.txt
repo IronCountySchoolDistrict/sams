@@ -1,0 +1,16 @@
+<script type="text/template" id="student-percent-template">
+<tr class="hiddenRow level_1 hidecount_1 nochildren">
+    <td>
+        <a href="/admin/reports/sams/grades/percentsreport.html" style="margin-left: 28px;">Student Percent Report</a>
+    </td>
+    <td>Search for student grades by percent. Select a function for this group of students.</td>
+</tr>
+</script>
+
+<script>
+    (function () {
+        var template = $j($j('#student-percent-template').html());
+        var selectInsert = $j('#grpGrades');
+        template.insertAfter(selectInsert);
+    }());
+</script>

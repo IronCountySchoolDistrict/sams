@@ -3,13 +3,16 @@
 <head>
     <title>SAMS - Current Grades Report</title>
     ~[wc:commonscripts]
-    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
-    <link href="/images/css/print.css" rel="stylesheet" media="print">
-    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/filtergrid.css" type="text/css">
-    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
-    <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/tablefilter_all.js"></script>
-    <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/sortabletable.js"></script>
-    <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/tfAdapter.sortabletable.js"></script>
+    <!-- Default CSS imports -->
+    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
+
+    <!-- TableFilter imports -->
+    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/filtergrid.css" type="text/css">
+    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tablefilter_all.js"></script>
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/sortabletable.js"></script>
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tfAdapter.sortabletable.js"></script>
     
     <script>
         function actionChange() {
@@ -29,6 +32,7 @@
                 col_4: "select",
                 col_5: "select",
                 col_6: "select",
+                col_7: "select",
                 sort: true,
                 on_keyup: true,
                 alternate_rows: true,
@@ -55,6 +59,12 @@
                 }
             };
             var tf2 = setFilterGrid("gradetable", gradetable_Props);
+
+            // Set the correct advisor dropdown value
+            var advisorGpv = "~[gpv:advisor]";
+            if (advisorGpv) {
+                $("[name=advisor]").val(advisorGpv);
+            }
         });
         function changeGrade() {
             $('#changeGrade').html("<select name='grade'><option ~[if.~[gpv:gd]=E]selected[/if] value='E'>E<option ~[if.~[gpv:gd]=S]selected[/if] value='S'>S<option ~[if.~[gpv:gd]=N]selected[/if] value='N'>N</select>");
@@ -139,7 +149,7 @@
                         FROM students
                         where schoolid=~(curschoolid) and enroll_status=0
                         and ps_customfields.getSTUDENTScf(students.id, 'advisor') IS NOT NULL]
-                            <option value="~(advisor)">~(advisor)
+                            <option value="~(advisor)" ~[if.~[gpv:advisor]=~(advisor)]selected[/if]>~(advisor)</option>
                         [/tlist_sql]
                     </select>
 

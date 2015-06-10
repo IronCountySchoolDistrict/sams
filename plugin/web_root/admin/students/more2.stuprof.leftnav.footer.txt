@@ -6,4 +6,4 @@
     [/if]
 </script>
 
-<script src="/scripts/SamsStudentProfile/student-profile.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/js/student-profile.js"></script>

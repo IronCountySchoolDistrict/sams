@@ -4,11 +4,14 @@
 <head>
     <title>Student Profile</title>
     ~[wc:commonscripts]
-    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
-    <link href="/images/css/print.css" rel="stylesheet" media="print">
-    <script type="text/javascript" src="/scripts/SamsStudentProfile/showPopup.js"></script>
-    <script type="text/javascript" src="/scripts/SamsStudentProfile/PS_Secure.js"></script>
-    <script type='text/javascript' src='/scripts/SamsStudentProfile/samscookies.js'></script>
+    <!-- Default CSS imports -->
+    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
+
+    <!-- sams imports -->
+    <script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/js/samscookies.js'></script>
+    <script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/js/showPopup.js'></script>
+
     <script type="text/javascript">
         var $ = jQuery.noConflict();
         $(document).ready(function () {
@@ -35,7 +38,7 @@
                 data: url,
                 jsonp: 'jsonp_callback',
                 timeout: 3000,
-                url: samsLocation + "Assessment/student_profile/profile2.php",
+                url: samsLocation + "/Assessment/student_profile/profile2.php",
                 success: function (msg) {
                     $('#loader').hide();
                     $("#reporttable").html(msg);

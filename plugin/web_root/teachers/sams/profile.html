@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Profile</title>
+    ~[wc:commonscripts]
+    <!-- Default CSS imports -->
+    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
+
+    <script type="text/javascript" src="<!-- @echo IMAGE_SERVER_URL -->/sams/js/showPopup.js"></script>
+    <script>
+        function formHandler(form){
+            var URL = document.navigation.page.options[document.navigation.page.selectedIndex].value;
+            window.location.href = URL;
+        }
+    </script>
+
+    <script>
+        var $ = jQuery.noConflict();
+        $(document).ready(function() {
+            $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/TF_Themes/Default/images/img_loading.gif'/></div>");
+            $('#loader').show();
+            var authkey = $('#seckey').val();
+            ~[if#test.~[gpv:teacheronly]=1]
+                var url = "studentnum=~(gpv.student_number)&at="+authkey+"&isteacher=1&close=1&setyear=~(termid)";
+            [else#test]
+                var url = "studentnum=~(student_number)&at="+authkey+"&isteacher=1&setyear=~(termid)";
+            [/if#test]
+            ~[wc:sams]
+            $.ajax({
+                dataType: 'jsonp',
+                data: url,
+                jsonp: 'jsonp_callback',
+                timeout: 3000,
+                url: samsLocation + "/Assessment/student_profile/profile2.php",
+                success: function (msg) {
+                    $('#loader').hide();
+                    $("#reporttable").html(msg);
+                    var $crt_pop_dialog = $('#crt_pop_dialog');
+                    $crt_pop_dialog.dialog({
+                        modal: false,
+                        title: '',
+                        resizable: true,
+                        autoOpen: false,
+                        position: 'center',
+                        width: 650,
+                        buttons: {
+                            Close: function() {
+                                closeCRT_POP();
+                            }
+                        }
+                    });
+                    $('.crt_pop').on('click', function() {
+                        $.ajax({
+                            dataType: 'jsonp',
+                            jsonp: 'jsonp_callback',
+                            url: $(this).attr('alt'),
+                            success: function (msg) {
+                                $crt_pop_dialog.html("<center>"+msg+"</center>");
+                                $crt_pop_dialog.show();
+                                $crt_pop_dialog.dialog('open');
+                            }
+                        })
+                    });
+                    var closeCRT_POP = function() {
+                        $crt_pop_dialog.dialog('close');
+                    }
+                },
+                error: function() {
+                    $('#reporttable').hide();
+                    $('#loader').html('<div>Unable to load report</div>')
+                }
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+
+~[wc:teachers_header_css]
+~[wc:teachers_navigation_css]
+~[wc:teachers_nav_css]
+
+~[if#nav.~[gpv:teacheronly]=1]
+[else#nav]
+<form name="navigation"><span class="account-photo">~[studenttitlephoto]</span><h1>SAMS<span class="nav-teacher"><select name="page" size=1 onChange="javascript:formHandler()"><option value="">~[text]psx.html.teachers_studentpages.demo.select_screens[/text]<option value="">--------------------~[x:teacherpages]</select></span>~[studentalert]</h1>
+    <p>~(studentname) &nbsp; ~(grade_level) &nbsp; ~(student_number) &nbsp; &nbsp; ~(track) &nbsp; &nbsp; ~(studschoolabbr) &nbsp; &nbsp; ~[enrollmentstatus]</p></form>
+[/if#nav]
+<div class="box-round">
+    <div class="backcontainer" style="text-align: center;">
+        <a href="/teachers/PTsearchResults.html?studentQuery=~(gpv.studentQuery)">
+            <img style="width: 15px;" src="<!-- @echo IMAGE_SERVER_URL -->/sams/images/back_button.png" />Back to Search Results
+        </a>
+    </div>
+    ~[tlist_sql;
+    select
+    psid
+    from
+    logins
+    where
+    userid = ~[x:userid] and dcid = (select max(dcid) from logins where userid=~[x:userid]);]
+    <form name='form'>
+
+        <input type="hidden" name="at" id='seckey' value="~(authkey)">
+    </form>
+    [/tlist_sql]
+
+    <center><span id='loader'>Load...Please Wait...<br><img src='<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/Default/images/img_loading.gif'/></span></center>
+    <div id='reporttable'></div>
+
+</div>
+
+~[wc:teachers_footer_fr_css]
+
+</body>
+</html>

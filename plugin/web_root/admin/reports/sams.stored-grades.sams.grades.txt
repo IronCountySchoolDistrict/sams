@@ -1,0 +1,16 @@
+<script type="text/template" id="stored-grades-template">
+    <tr class="hiddenRow level_1 hidecount_1 nochildren">
+        <td>
+            <a href="/admin/reports/sams/grades/storedgradesreport.html" style="margin-left: 28px;">Stored Grades Report</a>
+        </td>
+        <td>Search for student grades that have been stored.</td>
+    </tr>
+</script>
+
+<script>
+    (function () {
+        var template = $j($j('#stored-grades-template').html());
+        var selectInsert = $j('#grpGrades');
+        template.insertAfter(selectInsert);
+    }());
+</script>
