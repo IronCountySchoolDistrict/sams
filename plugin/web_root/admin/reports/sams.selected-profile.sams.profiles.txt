@@ -1,0 +1,16 @@
+<script type="text/template" id="selected-profile-template">
+    <tr class="hiddenRow level_1 hidecount_1 nochildren">
+        <td>
+            <a href="javascript:void(0);" id="selectedprofile" style="margin-left: 28px;">Selected Profile</a>
+            <span style="color: Red; margin-left: 10px;"> * </span></td>
+        <td>Summary report of CRT data on the selected students.</td>
+    </tr>
+</script>
+
+<script>
+    (function () {
+        var template = $j($j('#selected-profile-template').html());
+        var selectInsert = $j('#grpProfiles');
+        template.insertAfter(selectInsert);
+    }());
+</script>

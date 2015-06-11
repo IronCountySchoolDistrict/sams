@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<head>
+<title>SAMS - Selected Profile</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+
+<script>
+
+function tml(){
+	var frm = document.getElementById('MaxLoad');
+	if (frm && frm.style.display=='none'){
+	
+		frm.style.display = 'block';}else{
+		frm.style.display = 'none';
+		}
+}
+
+function livelistupdate(){
+	var ll = document.getElementById('livelist');
+	var ht = document.getElementById('selectedTeacher');
+	if(ll && ht) {
+		ht.value=ll.options[ll.selectedIndex].text;
+	}
+}
+
+
+function show(section) {
+	if(document.getElementById(section).style.display="none") {
+		document.getElementById(section).style.display="block";
+	}
+}
+
+window.onload = function () {
+	var vlivelist = document.getElementById('livelist');
+	if(vlivelist) {
+		vlivelist.onclick=livelistupdate;
+	}
+	
+	
+	var maxlink = document.getElementById('maxloadlink');
+	if(maxlink) {
+		maxlink.onclick=tml;
+	}
+}
+</script>
+
+<!-- TableFilter imports -->
+<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/filtergrid.css" type="text/css">
+<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+<script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tablefilter_all.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/sortabletable.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+
+<style>
+.ui-dialog .ui-dialog-title .ui-icon {
+    float: left;
+    margin-right: 4px;
+}
+a:link img
+{
+  border:none;
+}
+.helpBtn
+{
+  visibility: hidden;
+}
+#studentsdatatableHeader .fltrow
+{
+  visibility: hidden;
+}
+#studentsdatatableHeader th
+{
+  padding: none;
+  margin: none;
+}
+</style>
+
+<script type='text/javascript'>
+	var $ = jQuery.noConflict();
+	$(document).ready(function() {
+	~[wc:sams]
+	var authkey = $('#seckey').val();
+	var students = $('#students').val();
+	var students2 = students.replace('if.is.a.school', '');
+	var yearid = "~[yearid]";
+	var termid ="~[x:termid]";
+	var grade = 0;
+	if("~[gpv:gradevalue]" > 0 || "~[gpv:gradevalue]" < 0)
+	{
+	grade = "~[gpv:gradevalue]";
+	}
+	var url = "Students="+students+"&at="+authkey+"&YearID="+yearid+"&abbreviation="+termid+"&Count=~[x:functionssetselection]~[x:studsinset]&gradevalue="+grade;
+	if("~[gpv:all]" == 'all')
+	{
+	url = "getALL=true&at="+authkey+"&YearID="+yearid+"&abbreviation="+termid+"&schoolid=~[gpv:schoolid]&gradevalue="+grade;
+	}
+	if("~[gpv:all]" == 'in')
+	{
+	url = "getIN=true&at="+authkey+"&YearID="+yearid+"&abbreviation="+termid+"&schoolid=~[gpv:schoolid]&gradevalue="+grade;
+	}
+	if("~[gpv:all]" == 'out')
+	{
+	url = "getOUT=true&at="+authkey+"&YearID="+yearid+"&abbreviation="+termid+"&schoolid=~[gpv:schoolid]&gradevalue="+grade;
+	}
+	$('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='/images/loading.gif'/></div>");
+	$('#loader').show();
+	$.ajax({
+	dataType: 'jsonp',
+	data: url,
+	jsonp: 'jsonp_callback',
+	url: "http://"+samsip+samspath+"Assessment/classprofile2.php",
+	success: function (msg) {
+	    $('#loader').hide();
+	    $("#reporttable").html(msg);
+
+	$('#studentstable').hide();
+	$('#showstudentslink').click(function(){
+	//$('#studentstable').toggle('blind', 1000);
+	if($('#showstudentstext').text() == 'Show Students')
+	{
+	  $('#showstudentstext').text('Hide Students');
+	  $('#studentstable').slideDown('slow');
+	}
+	else
+	{
+	  $('#showstudentstext').text('Show Students');
+	  $('#studentstable').slideUp('slow');
+	}
+	});
+	 $('#crt_pop_dialog').dialog({ autoOpen: false, buttons: { 'Close': function() {$(this).dialog("close"); } }});
+	$crt_pop_dialog = $('#crt_pop_dialog');
+	$crt_pop_dialog.dialog({
+		  modal: false,
+		  title: '',
+		  resizable: true,
+		  autoOpen: false,
+		  position: 'center',
+		  width: 650,
+		  buttons: {
+			  Close: function() {
+				 closeCRT_POP();
+			  }
+		  }
+	  });
+	//function to close dialog, probably called by a button in the dialog
+	var closeCRT_POP = function() {
+	    $crt_pop_dialog.dialog("close");
+	}
+
+	$('.crt_pop').click(function() { 
+		    $.ajax({
+		    dataType: 'jsonp',
+		    jsonp: 'jsonp_callback',
+		    url: $(this).attr('alt'),
+		    success: function (msg) {
+		    $('#crt_pop_dialog').html("<center>"+msg+"</center>");
+		    $crt_pop_dialog.show();
+		    $crt_pop_dialog.dialog("open");
+		    }
+		    });
+	});
+	}});
+	});
+</script>
+
+</head>
+
+<body>
+<div id='crt_pop_dialog'></div>
+<form name="AssessmentSummary" action="" method="POST">
+<input type="hidden" id='students' name="Students" value="~[studentlist]~(studentfrn),[/studentlist]"/>
+~[tlist_sql;select psid from logins where userid = ~[x:userid] and dcid = (select max(dcid) from logins where userid=~[x:userid]);]
+<input type="hidden" name="at" id='seckey' value="~(authkey)"/>
+[/tlist_sql]
+
+</form>
+~[wc:admin_header_css_sams]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.runreports.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.runreports.reports]</a> &gt; <a href='/admin/reports/sams.html'>SAMS</a> &gt; Selected Profile<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>SAMS</h1><div id='reporttitle'></div>
+~[SetPostValue:repType=SAMS]
+~[x:insertfile;reporttabs.html]
+
+<!-- start of content and bounding box -->
+<div class="box-round">
+<center><span id='loader'></span></center>
+<div id='reporttable'></div>
+
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->
