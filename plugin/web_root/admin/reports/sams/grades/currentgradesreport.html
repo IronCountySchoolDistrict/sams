@@ -8,12 +8,12 @@
     <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
 
     <!-- TableFilter imports -->
-    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/filtergrid.css" type="text/css">
-    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
-    <script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tablefilter_all.js"></script>
-    <script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/sortabletable.js"></script>
-    <script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tfAdapter.sortabletable.js"></script>
-    
+    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/filtergrid.css" type="text/css">
+    <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tablefilter_all.js"></script>
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/sortabletable.js"></script>
+    <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+
     <script>
         function actionChange() {
             document.gradesform.action = 'currentgradesreport.html?dothisfor=selected&tm=' + document.gradesform.term.value + '&gd=' + document.gradesform.grade.value + '&mn=' + document.gradesform.minnum.value + '&maxn=' + document.gradesform.maxnum.value +'&se=' + document.gradesform.choice.value + '&advisor=' + document.gradesform.advisor.value;
@@ -25,8 +25,8 @@
         $(document).ready(function () {
             'use strict';
             var gradetable_Props = {
-                base_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/",
-                themes_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/",                
+                base_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/",
+                themes_path: "<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/",
                 col_1: "select",
                 col_2: "select",
                 col_4: "select",
@@ -41,12 +41,12 @@
                 btn_reset: true,
                 btn_reset_text: "Clear all ",
                 loader: true,
-                loader_html: '<img src="<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/Default/images/img_loading.gif"/> Filtering data...',
+                loader_html: '<img src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/Default/images/img_loading.gif"/> Filtering data...',
                 display_all_text: " [ Show all ] ",
                 sort_select: true,
                 sort_config: {
                     sort_types: [
-                        "String", //LastFirst 
+                        "String", //LastFirst
                         "Number", //Grade Level
                         "String", //Grade
                         "Number", //Percent

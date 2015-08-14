@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <!-- non framed -->
+    <head>
+        <title>SAMS - Student Roster</title>
+        ~[wc:commonscripts]
+        <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+        <link href="/images/css/print.css" rel="stylesheet" media="print">
+
+        <script>
+
+            function tml() {
+                var frm = document.getElementById('MaxLoad');
+                if (frm && frm.style.display == 'none') {
+
+                    frm.style.display = 'block';
+                } else {
+                    frm.style.display = 'none';
+
+                }
+            }
+
+            function livelistupdate() {
+                var ll = document.getElementById('livelist');
+                var ht = document.getElementById('selectedTeacher');
+                if (ll && ht) {
+                    ht.value = ll.options[ll.selectedIndex].text;
+                }
+            }
+
+
+            function show(section) {
+                if (document.getElementById(section).style.display = "none") {
+                    document.getElementById(section).style.display = "block";
+                }
+            }
+
+            window.onload = function () {
+                var vlivelist = document.getElementById('livelist');
+                if (vlivelist) {
+                    vlivelist.onclick = livelistupdate;
+                }
+
+
+                var maxlink = document.getElementById('maxloadlink');
+                if (maxlink) {
+                    maxlink.onclick = tml;
+                }
+            }
+
+        </script>
+        <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/filtergrid.css" type="text/css">
+        <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+        <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tablefilter_all.js"></script>
+        <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/sortabletable.js"></script>
+        <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+        <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/tablesorter/blue/style.css" type="text/css">
+        <script>
+            var $ = jQuery;
+            $(document).ready(function () {
+            //&sectionsid="+sectionid+"&sectionsfrn="+sectionsfrn+"&coursename="+expression+" "+coursename;
+                ~[wc:sams]
+                var authkey = $('#seckey').val();
+                var students = $('#students').val();
+                var students2 = students.replace('if.is.a.school', '');
+                var yearid = "~[yearid]";
+                var termid = "~[x:termid]";
+                var url = "admin=true&at=" + $('#seckey').val() + "&yearid=" + yearid + "&termid=" + termid + "&students=" + students2;
+                $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='<!-- @echo IMAGE_SERVER_URL -->/sams/images/img_loading.gif'/></div>");
+                $('#loader').show();
+                $.ajax({
+                    dataType: 'jsonp',
+                    data: url,
+                    jsonp: 'jsonp_callback',
+                    url: samsLocation + 'Assessment/classroster.php',
+                    success: function (msg) {
+                        $('#loader').hide();
+                        $('#rosterGraph').hide();
+                        $("#reporttable").append(msg);
+                    }
+                });
+            });
+        </script>
+    </head>
+
+    <body>
+    <div id='crt_pop_dialog'></div>
+    <form name="AssessmentSummary" action="" method="POST">
+        <input type="hidden" id='students' name="students" value="~[studentlist]~(studentfrn),[/studentlist]"/>
+        ~[tlist_sql;select psid from logins where userid = ~[x:userid] and dcid = (select max(dcid) from logins where
+        userid=~[x:userid]);]
+        <input type="hidden" name="at" id='seckey' value="~(authkey)"/>
+        [/tlist_sql]
+
+    </form>
+    ~[wc:admin_header_css_sams]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.runreports.start_page]</a>
+    &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.runreports.reports]</a> &gt; <a
+            href='/admin/reports/sams.html'>SAMS</a> &gt; Student Roster<!-- breadcrumb end -->
+    ~[wc:admin_navigation_css]
+
+    <h1>SAMS</h1>
+
+    <div id='reporttitle'></div>
+    ~[SetPostValue:repType=SAMS]
+    ~[x:insertfile;reporttabs.html]
+
+    <!-- start of content and bounding box -->
+    <div class="box-round">
+        <center><span id='loader'></span></center>
+        <span style="width: 100%; display: inline-table;">
+            <div id='reporttable'>
+
+            </div>
+        </span>
+
+    </div>
+    <br>
+    <!-- end of content of bounding box -->
+
+    ~[wc:admin_footer_css]
+
+    </body>
+</html><!-- non framed -->

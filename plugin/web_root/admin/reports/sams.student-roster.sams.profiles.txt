@@ -1,0 +1,17 @@
+<script type="text/template" id="student-roster-template">
+  <tr class="hiddenRow level_1 hidecount_1 nochildren">
+      <td>
+        <img src="<!-- @echo IMAGE_SERVER_URL -->/images/listblank.gif" height="11" width="28" alt="" border="0">
+        <a href="#" id="studentroster">Student Roster</a><span style="color: Red; margin-left: 10px;"> * </span>
+      </td>
+      <td>Report showing Sped, ELL, and Alerts.</td>
+  </tr>
+</script>
+
+<script>
+    (function () {
+        var template = $j($j('#student-roster-template').html());
+        var selectInsert = $j('#grpProfiles');
+        //template.insertAfter(selectInsert);
+    }());
+</script>

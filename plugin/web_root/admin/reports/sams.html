@@ -58,11 +58,11 @@
 </script>
 
 <!-- TableFilter imports -->
-<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/filtergrid.css" type="text/css">
-<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
-<script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tablefilter_all.js"></script>
-<script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/sortabletable.js"></script>
-<script src="<!-- @echo IMAGE_SERVER_URL -->/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/filtergrid.css" type="text/css">
+<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tablefilter_all.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/sortabletable.js"></script>
+<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
 
 <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/js/samscookies.js"></script>
 
@@ -142,7 +142,7 @@ require(["jquery"], function($) {
             setCookie("returntype", "", 365);
             $('#samscontainer').fadeOut('slow', function () {
             });
-            window.location = '/admin/sams/selectedprofile.html';
+            window.location = '/admin/reports/sams/selectedprofile.html';
         }
     //END RETURN TYPE
         $('#assessmentsummary').click(function () {
@@ -178,7 +178,7 @@ require(["jquery"], function($) {
             else {
                 $('#samscontainer').fadeOut('slow', function () {
                 });
-                window.location = '/admin/sams/selectedprofile.html';
+                window.location = '/admin/reports/sams/profiles/selectedprofile.html';
             }
         });
 
@@ -188,7 +188,7 @@ require(["jquery"], function($) {
             }
             else {
                 $('#samscontainer').fadeOut('slow', function () {
-                    window.location = '/admin/sams/studentroster.html';
+                    window.location = '/admin/reports/sams/profiles/studentroster.html';
                 });
             }
         });
@@ -228,7 +228,7 @@ require(["jquery"], function($) {
         $noStudents = $('#nostudents');
         $noStudents.dialog({
             modal: true,
-            title: "<span class='ui-icon ui-icon-alert'></span><b>Warning:</b> No Students Selected",
+            title: "Warning: No Students Selected",
             resizable: false,
             autoOpen: false,
             width: 450,
@@ -361,7 +361,7 @@ require(["jquery"], function($) {
 
         var closeCRT_POP = function () {
             $crt_pop_dialog.dialog('close');
-            $.getScript('/scripts/jquery-ui-1.8.13.custom.min.js');
+            $.getScript('<!-- @echo IMAGE_SERVER_URL -->/scripts/jquery-ui-1.8.13.custom.min.js');
         };
         $('.crt_pop').click(function () {
             $.ajax({

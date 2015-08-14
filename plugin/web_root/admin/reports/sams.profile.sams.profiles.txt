@@ -1,0 +1,15 @@
+<script type="text/template" id="profile-template">
+    <tr class="hiddenRow level_1 hidecount_1 nochildren">
+        <td>
+            <a href="/admin/reports/sams/profiles/profile.html" style="margin-left: 28px;">Profile</a></td>
+        <td>Summary report of CRT data.</td>
+    </tr>
+</script>
+
+<script>
+    (function () {
+        var template = $j($j('#profile-template').html());
+        var selectInsert = $j('#grpProfiles');
+        //template.insertAfter(selectInsert);
+    }());
+</script>

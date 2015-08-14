@@ -1,5 +1,6 @@
 <!-- Start Sams custom content -->
 <script>
+/*
     $j(function () {
         // SAMS Button
         var searches = $j('.searchButtons');
@@ -8,5 +9,6 @@
         htmlsrc.insertAfter(lastSearch);
         htmlsrc.css('padding-left', '10px');
     });
+*/
 </script>
 <!-- End Sams custom content -->

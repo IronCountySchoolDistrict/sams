@@ -11,6 +11,6 @@
     (function () {
         var template = $j($j('#student-percent-template').html());
         var selectInsert = $j('#grpGrades');
-        template.insertAfter(selectInsert);
+        //template.insertAfter(selectInsert);
     }());
 </script>
