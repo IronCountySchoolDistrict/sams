@@ -4,10 +4,10 @@
     <title>Student Profile</title>
     ~[wc:commonscripts]
     <!-- Default CSS imports -->
-    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/screen.css" rel="stylesheet" media="screen">
-    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
+    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="/images/css/print.css" rel="stylesheet" media="print">
 
-    <script type="text/javascript" src="<!-- @echo IMAGE_SERVER_URL -->/sams/js/showPopup.js"></script>
+    <script type="text/javascript" src="/scripts/sams/js/showPopup.js"></script>
     <script>
         function formHandler(form){
             var URL = document.navigation.page.options[document.navigation.page.selectedIndex].value;
@@ -18,7 +18,7 @@
     <script>
         var $ = jQuery.noConflict();
         $(document).ready(function() {
-            $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/Default/images/img_loading.gif'/></div>");
+            $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='/scripts/sams/ext/TableFilter/TF_Themes/Default/images/img_loading.gif'/></div>");
             $('#loader').show();
             var authkey = $('#seckey').val();
             ~[if#test.~[gpv:teacheronly]=1]
@@ -90,7 +90,7 @@
 <div class="box-round">
     <div class="backcontainer" style="text-align: center;">
         <a href="/teachers/PTsearchResults.html?studentQuery=~(gpv.studentQuery)">
-            <img style="width: 15px;" src="<!-- @echo IMAGE_SERVER_URL -->/sams/images/back_button.png" />Back to Search Results
+            <img style="width: 15px;" src="/images/sams/images/back_button.png" />Back to Search Results
         </a>
     </div>
     ~[tlist_sql;
@@ -106,7 +106,7 @@
     </form>
     [/tlist_sql]
 
-    <center><span id='loader'>Load...Please Wait...<br><img src='<!-- @echo IMAGE_SERVER_URL -->/sams/TableFilter/TF_Themes/Default/images/img_loading.gif'/></span></center>
+    <center><span id='loader'>Load...Please Wait...<br><img src='/scripts/sams/TableFilter/TF_Themes/Default/images/img_loading.gif'/></span></center>
     <div id='reporttable'></div>
 
 </div>

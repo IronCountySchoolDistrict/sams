@@ -5,26 +5,26 @@
 <title>SAMS - Profile Builder</title>
 ~[wc:commonscripts]
 <!-- Default CSS imports -->
-<link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/screen.css" rel="stylesheet" media="screen">
-<link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
 
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/jquery.cookies/jquery_cookies.js"></script>
+<script src="/scripts/sams/ext/jquery.cookies/jquery_cookies.js"></script>
 
 <!-- tablesorter imports -->
-<link href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/tablesorter/blue/style.css">
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/tablesorter/jquery.tablesorter.js"></script>
+<link href="/scripts/sams/ext/tablesorter/blue/style.css">
+<script src="/scripts/sams/ext/tablesorter/jquery.tablesorter.js"></script>
 
 <!-- TableFilter imports -->
-<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/filtergrid.css" type="text/css">
-<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tablefilter_all.js"></script>
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/sortabletable.js"></script>
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+<link rel="stylesheet" href="/scripts/sams/ext/TableFilter/filtergrid.css" type="text/css">
+<link rel="stylesheet" href="/scripts/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+<script src="/scripts/sams/ext/TableFilter/tablefilter_all.js"></script>
+<script src="/scripts/sams/ext/TableFilter/sortabletable.js"></script>
+<script src="/scripts/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
 
 <!-- fusioncharts imports -->
-<script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/ext/fusioncharts/FusionCharts.js'></script>
-<script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/ext/fusioncharts/highcharts.js'></script>
-<script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/ext/fusioncharts/FusionChartsExportComponent.js'></script>
+<script type='text/javascript' src='/scripts/sams/ext/fusioncharts/FusionCharts.js'></script>
+<script type='text/javascript' src='/scripts/sams/ext/fusioncharts/highcharts.js'></script>
+<script type='text/javascript' src='/scripts/sams/ext/fusioncharts/FusionChartsExportComponent.js'></script>
 
 
 <script type='text/javascript'>
@@ -112,7 +112,7 @@
                 $("#reporttype").change(function () { //Report Type Change
                     var fileref = document.createElement('script');
                     fileref.setAttribute("type", "text/javascript");
-                    fileref.setAttribute("src", "/scripts/SamsProfilesProfile/jquery_cookies.js");
+                    fileref.setAttribute("src", "/scripts/sams/ext/jquery.cookies/jquery_cookies.js");
                     if ($('#reporttype :selected').val() == "d") //District
                     {
                         $('#reporttype').show();

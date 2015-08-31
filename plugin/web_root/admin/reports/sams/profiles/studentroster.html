@@ -49,12 +49,12 @@
             }
 
         </script>
-        <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/filtergrid.css" type="text/css">
-        <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
-        <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tablefilter_all.js"></script>
-        <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/sortabletable.js"></script>
-        <script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
-        <link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/tablesorter/blue/style.css" type="text/css">
+        <link rel="stylesheet" href="/scripts/sams/ext/TableFilter/filtergrid.css" type="text/css">
+        <link rel="stylesheet" href="/scripts/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+        <script src="/scripts/sams/ext/TableFilter/tablefilter_all.js"></script>
+        <script src="/scripts/sams/ext/TableFilter/sortabletable.js"></script>
+        <script src="/scripts/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+        <link rel="stylesheet" href="/scripts/sams/ext/tablesorter/blue/style.css" type="text/css">
         <script>
             var $ = jQuery;
             $(document).ready(function () {
@@ -66,7 +66,7 @@
                 var yearid = "~[yearid]";
                 var termid = "~[x:termid]";
                 var url = "admin=true&at=" + $('#seckey').val() + "&yearid=" + yearid + "&termid=" + termid + "&students=" + students2;
-                $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='<!-- @echo IMAGE_SERVER_URL -->/sams/images/img_loading.gif'/></div>");
+                $('#loader').html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='/images/sams/img_loading.gif'/></div>");
                 $('#loader').show();
                 $.ajax({
                     dataType: 'jsonp',

@@ -5,12 +5,12 @@
     <title>Student Profile</title>
     ~[wc:commonscripts]
     <!-- Default CSS imports -->
-    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/screen.css" rel="stylesheet" media="screen">
-    <link href="<!-- @echo IMAGE_SERVER_URL -->/images/css/print.css" rel="stylesheet" media="print">
+    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="/images/css/print.css" rel="stylesheet" media="print">
 
     <!-- sams imports -->
-    <script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/js/samscookies.js'></script>
-    <script type='text/javascript' src='<!-- @echo IMAGE_SERVER_URL -->/sams/js/showPopup.js'></script>
+    <script type='text/javascript' src='/scripts/sams/js/samscookies.js'></script>
+    <script type='text/javascript' src='/scripts/sams/js/showPopup.js'></script>
 
     <script type="text/javascript">
         var $ = jQuery.noConflict();
@@ -28,7 +28,7 @@
         $(document).ready(function () {
             'use strict';
             var loader = $('#loader');
-            loader.html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='<!-- @echo IMAGE_SERVER_URL -->/sams/images/img_loading.gif'/></div>");
+            loader.html("<div style='width: 400px'>Loading Report......Please Wait.<br><br><img src='/images/sams/img_loading.gif'/></div>");
             loader.show();
             var authkey = $('#seckey').val();
             var url = "studentnum=~([Students]Student_Number)&at=" + authkey + "&schoolnum=~(gpv.schoolnum)&abbreviation=~(gpv.abbreviation)&setyear=~(termid)&yearid=~(gpv.yearid)&teacherid=~(gpv.teacherid)&return=~(gpv.return)&all=~(gpv.all)";
@@ -116,4 +116,3 @@
 
 </body>
 </html><!-- non framed -->
-

@@ -12,7 +12,7 @@
 function tml(){
 	var frm = document.getElementById('MaxLoad');
 	if (frm && frm.style.display=='none'){
-	
+
 		frm.style.display = 'block';}else{
 		frm.style.display = 'none';
 		}
@@ -38,8 +38,8 @@ window.onload = function () {
 	if(vlivelist) {
 		vlivelist.onclick=livelistupdate;
 	}
-	
-	
+
+
 	var maxlink = document.getElementById('maxloadlink');
 	if(maxlink) {
 		maxlink.onclick=tml;
@@ -48,11 +48,11 @@ window.onload = function () {
 </script>
 
 <!-- TableFilter imports -->
-<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/filtergrid.css" type="text/css">
-<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tablefilter_all.js"></script>
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/sortabletable.js"></script>
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+<link rel="stylesheet" href="/scripts/sams/ext/TableFilter/filtergrid.css" type="text/css">
+<link rel="stylesheet" href="/scripts/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+<script src="/scripts/sams/ext/TableFilter/tablefilter_all.js"></script>
+<script src="/scripts/sams/ext/TableFilter/sortabletable.js"></script>
+<script src="/scripts/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
 
 <style>
 .ui-dialog .ui-dialog-title .ui-icon {
@@ -150,7 +150,7 @@ a:link img
 	    $crt_pop_dialog.dialog("close");
 	}
 
-	$('.crt_pop').click(function() { 
+	$('.crt_pop').click(function() {
 		    $.ajax({
 		    dataType: 'jsonp',
 		    jsonp: 'jsonp_callback',

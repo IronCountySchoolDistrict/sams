@@ -58,17 +58,17 @@
 </script>
 
 <!-- TableFilter imports -->
-<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/filtergrid.css" type="text/css">
-<link rel="stylesheet" href="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tablefilter_all.js"></script>
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/sortabletable.js"></script>
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+<link rel="stylesheet" href="/scripts/sams/ext/TableFilter/filtergrid.css" type="text/css">
+<link rel="stylesheet" href="/scripts/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+<script src="/scripts/sams/ext/TableFilter/tablefilter_all.js"></script>
+<script src="/scripts/sams/ext/TableFilter/sortabletable.js"></script>
+<script src="/scripts/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
 
-<script src="<!-- @echo IMAGE_SERVER_URL -->/sams/js/samscookies.js"></script>
+<script src="/scripts/sams/js/samscookies.js"></script>
 
 <script type="text/template" id="sams-img-template">
     <a href="/admin/reports/sams.html" style="margin-left: 200px; margin-top: -25px;">
-        <img src="<!-- @echo IMAGE_SERVER_URL -->/sams/images/sams.png" alt="Sams" height="28"/>
+        <img src="/scripts/sams/images/sams.png" alt="Sams" height="28"/>
     </a>
 </script>
 <script>
@@ -361,7 +361,7 @@ require(["jquery"], function($) {
 
         var closeCRT_POP = function () {
             $crt_pop_dialog.dialog('close');
-            $.getScript('<!-- @echo IMAGE_SERVER_URL -->/scripts/jquery-ui-1.8.13.custom.min.js');
+            $.getScript('/scripts/jquery-ui-1.8.13.custom.min.js');
         };
         $('.crt_pop').click(function () {
             $.ajax({
