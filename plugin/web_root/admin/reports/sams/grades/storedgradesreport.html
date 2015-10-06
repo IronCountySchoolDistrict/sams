@@ -16,7 +16,7 @@
 
     <script>
         function actionChange() {
-            document.gradesform.action = 'storedgradesreport.html?term=' + document.gradesform.termchoice.value + '&grade=' + document.gradesform.gradechoice.value + '&which=' + document.gradesform.allgrades.value + '&level=' + document.gradesform.gradelevel.value + '&sort=' + document.gradesform.sortchoice.value;
+            document.gradesform.action = 'storedgradesreport.html?year=' + document.gradesform.yearchoice.value + '&term=' + document.gradesform.termchoice.value + '&grade=' + document.gradesform.gradechoice.value + '&which=' + document.gradesform.allgrades.value + '&level=' + document.gradesform.gradelevel.value + '&sort=' + document.gradesform.sortchoice.value;
         }
 
         var $ = jQuery.noConflict();
@@ -71,8 +71,8 @@
 <h1>SAMS</h1>~[SetPostValue:repType=SAMS]
 ~[x:insertfile;reporttabs.html]
 <h4>
-    <div id='reporttitle'>Stored Grades Report - ~[gpv:term] ~(decode;~[gpv:grade];DsAndFs;, D's and F's;Ds;, D's;Fs;,
-        F's;Is;, I's;; ) ~(decode;~[gpv:which];All;, All Grade Levels;EQ;, Grade Level = ~[gpv:level];GTE;, Grade Level
+    <div id='reporttitle'>Stored Grades Report - ~[gpv:term] ~(decode;~[gpv:grade];DsAndFs;, Ds and Fs;Ds;, Ds;Fs;,
+        Fs;Is;, Is;As;, As;Bs;, Bs;Cs;, Cs;; ) ~(decode;~[gpv:which];All;, All Grade Levels;EQ;, Grade Level = ~[gpv:level];GTE;, Grade Level
         >= ~[gpv:level];LTE;, Grade Level <= ~[gpv:level];; ) ~(decode;~[gpv:sort];S;, Sorted by Student;T;, Sorted by
         Teacher;C;, Sorted by Course;E;, Sorted by Expression;P;, Sorted by Perecent;; )
     </div>
@@ -81,7 +81,7 @@
 <div class="box-round">
     <center>
         <a href='/admin/reports/sams.html'>
-            <img src='/images/sams/images/back_button.png' width=15 border='0'/> Go Back to Sams</a>
+            <img src='/images/sams/back_button.png' width=15 border='0'/> Go Back to Sams</a>
     </center>
 
     <center>Choose from the options below and click on Create. If All Grades is chosen for class, the grade level choice
@@ -91,6 +91,20 @@
         <table border="0" cellspacing="0" cellpadding="2" style='margin: 0 auto; width: 800px;'>
             <!-- start of drop-down menus coding -->
             <tr>
+                <td class="bold">Year:</td>
+                <td>
+                    <select name="yearchoice">
+                        ~[tlist_sql;
+                        SELECT id,
+                        CASE WHEN id = '~[gpv:year]' THEN 'selected' ELSE '' END,
+                        name
+                          FROM terms t
+                          WHERE t.SCHOOLID = ~(curschoolid) AND SUBSTR(t.id, -1) = '0'
+                          order by name desc]
+                        <option value="~(id;t)" ~(selectedyear;t)>~(name;t)</option>
+                        [/tlist_sql]
+                    </select>
+                </td>
                 <td class="bold">Term:</td>
                 <td>
                     <select name="termchoice">
@@ -108,13 +122,26 @@
                 </td>
                 <td class="bold">Grades:</td>
                 <td><select name="gradechoice">
-                    <option value="DsAndFs">D's & F's
                     <option
-                    ~[if.~[gpv:grade]=Ds]selected[/if] value="Ds">Only D's
+                    ~[if.~[gpv:grade]=As]selected[/if] value="As">Only As</option>
                     <option
-                    ~[if.~[gpv:grade]=Fs]selected[/if] value="Fs">Only F's
                     <option
-                    ~[if.~[gpv:grade]=Is]selected[/if] value="Is">Only I's
+                    ~[if.~[gpv:grade]=Bs]selected[/if] value="Bs">Only Bs</option>
+                    <option
+                    <option
+                    ~[if.~[gpv:grade]=Cs]selected[/if] value="Cs">Only Cs</option>
+                    <option
+                    <option value="DsAndFs">Ds & Fs
+                    <option
+                    ~[if.~[gpv:grade]=Ds]selected[/if] value="Ds">Only Ds</option>
+                    <option
+                    ~[if.~[gpv:grade]=Fs]selected[/if] value="Fs">Only Fs</option>
+                    <option
+                    ~[if.~[gpv:grade]=Is]selected[/if] value="Is">Only Is</option>
+                    <option
+                    ~[if.~[gpv:grade]=Ps]selected[/if] value="Ps">Only Ps</option>
+                    <option
+                    ~[if.~[gpv:grade]=NGs]selected[/if] value="NGs">Only NGs</option>
                 </select></td>
                 <td class="bold">Class:</td>
                 <td><select name="allgrades">
@@ -182,17 +209,21 @@
         INNER JOIN Students s ON sg.StudentID = s.ID
         INNER JOIN Sections sec ON sg.SectionID = sec.ID
 
-        WHERE s.enroll_status = 0
-        and sg.schoolid = ~(curschoolid)
+        WHERE sg.schoolid = ~(curschoolid)
         and sg.StoreCode = '~[gpv:term]'
-        and sg.Termid >= ~(curyearid)00
-        ~[if.~[gpv:which]=EQ]and s.Grade_Level = ~[gpv:level][/if]
-        ~[if.~[gpv:which]=GTE]and s.Grade_Level >= ~[gpv:level][/if]
-        ~[if.~[gpv:which]=LTE]and s.Grade_Level <= ~[gpv:level][/if]
+        AND floor(sg.Termid / 100) = floor(1900 / 100)
+        ~[if.~[gpv:which]=EQ]and sg.Grade_Level = ~[gpv:level][/if]
+        ~[if.~[gpv:which]=GTE]and sg.Grade_Level >= ~[gpv:level][/if]
+        ~[if.~[gpv:which]=LTE]and sg.Grade_Level <= ~[gpv:level][/if]
         ~[if.~[gpv:grade]=DsAndFs]and sg.Grade IN ('D+','D','D-','F')[/if]
+        ~[if.~[gpv:grade]=As]and sg.Grade LIKE 'A%'[/if]
+        ~[if.~[gpv:grade]=Bs]and sg.Grade LIKE 'B%'[/if]
+        ~[if.~[gpv:grade]=Cs]and sg.Grade LIKE 'C%'[/if]
         ~[if.~[gpv:grade]=Ds]and sg.Grade LIKE 'D%'[/if]
         ~[if.~[gpv:grade]=Fs]and sg.Grade LIKE 'F%'[/if]
         ~[if.~[gpv:grade]=Is]and sg.Grade LIKE 'I%'[/if]
+        ~[if.~[gpv:grade]=Ps]and sg.Grade LIKE 'P%'[/if]
+        ~[if.~[gpv:grade]=NGs]and sg.Grade LIKE 'NG%'[/if]
 
 
         ORDER BY

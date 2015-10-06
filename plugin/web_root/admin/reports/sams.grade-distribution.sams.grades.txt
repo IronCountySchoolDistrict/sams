@@ -1,0 +1,16 @@
+<script type="text/template" id="grades-distribution-template">
+    <tr class="hiddenRow level_1 hidecount_1 nochildren">
+        <td>
+            <a href="/admin/reports/sams/grades/gradesdistributionreport.html" style="margin-left: 28px;">Grades Distribution Report</a>
+        </td>
+        <td>Show distribution of grades for teachers</td>
+    </tr>
+</script>
+
+<script>
+    (function () {
+        var template = $j($j('#grades-distribution-template').html());
+        var selectInsert = $j('#grpGrades');
+        template.insertAfter(selectInsert);
+    }());
+</script>

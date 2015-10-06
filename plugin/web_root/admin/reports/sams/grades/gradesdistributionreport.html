@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SAMS - Grades Distribution Report</title>
+    ~[wc:commonscripts]
+    <!-- Default CSS imports -->
+    <link href="/images/css/screen.css" rel="stylesheet" media="screen">
+    <link href="/images/css/print.css" rel="stylesheet" media="print">
+
+    <!-- TableFilter imports -->
+    <link rel="stylesheet" href="/scripts/sams/ext/TableFilter/filtergrid.css" type="text/css">
+    <link rel="stylesheet" href="/scripts/sams/ext/TableFilter/TF_Themes/Default/TF_Default.css" type="text/css">
+    <script src="/scripts/sams/ext/TableFilter/tablefilter_all.js"></script>
+    <script src="/scripts/sams/ext/TableFilter/sortabletable.js"></script>
+    <script src="/scripts/sams/ext/TableFilter/tfAdapter.sortabletable.js"></script>
+
+    <script>
+
+        var $ = jQuery.noConflict();
+        $(document).ready(function () {
+            'use strict';
+            var gradetable_Props = {
+                base_path: "/scripts/sams/ext/TableFilter/",
+                themes_path: "/scripts/sams/ext/TableFilter/TF_Themes/",
+                col_0: "select",
+                sort: true,
+                on_keyup: true,
+                alternate_rows: true,
+                rows_counter: true,
+                rows_counter_text: "Total rows: ",
+                btn_reset: true,
+                btn_reset_text: "Clear all ",
+                loader: true,
+                loader_html: '<img src="/scripts/sams/ext/TableFilter/TF_Themes/Default/images/img_loading.gif"/> Filtering data...',
+                display_all_text: " [ Show all ] ",
+                sort_select: true
+            };
+            var tf2 = setFilterGrid("gradetable", gradetable_Props);
+            $('#inf_gradetable,.tablesorter').wrapAll('<div id=tablewrapper><\/div>');
+            $('#tablewrapper').css({
+                display: 'inline-table',
+                width: '100%'
+            });
+        });
+    </script>
+    <style>
+        .helpBtn {
+            visibility: hidden;
+        }
+
+
+    </style>
+</head>
+
+<body>
+
+<script type="text/javascript" src="/scripts/timeentry_widget.js"></script>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.runreports.start_page]</a>
+&gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.runreports.reports]</a> &gt; <a
+        href='/admin/reports/sams.html'>SAMS</a> &gt; Grades Distribution Report<!-- breadcrumb end -->
+~[wc:admin_navigation_css]
+
+<h1>SAMS</h1>~[SetPostValue:repType=SAMS]
+~[x:insertfile;reporttabs.html]
+<h4>
+    <div id='reporttitle'>Grades Distribution Report - ~[gpv:termchoicechoice], Grade Level <= ~[gpv:gradelevel];; )
+    </div>
+</h4>
+<!-- Start of shaded content table -->
+<div class="box-round">
+    <center>
+        <a href='/admin/reports/sams.html'>
+            <img src='/images/sams/back_button.png' width=15 border='0'/> Go Back to Sams</a>
+    </center>
+
+    <center>Choose from the options below and click on Create. If All Grades is chosen for class, the grade level choice
+        is ignored.
+    </center>
+    <form name="gradesform" action="gradesdistributionreport.html" method="POST">
+        <table border="0" cellspacing="0" cellpadding="2" style='margin: 0 auto; width: 800px;'>
+            <!-- start of drop-down menus coding -->
+            <tr>
+                <td class="bold">Year:</td>
+                <td>
+                    <select name="yearchoice">
+                        ~[tlist_sql;
+                        SELECT id,
+                        CASE WHEN id = '~[gpv:yearchoice]' THEN 'selected' ELSE '' END,
+                        name
+                          FROM terms t
+                          WHERE t.SCHOOLID = ~(curschoolid) AND SUBSTR(t.id, -1) = '0'
+                          order by name desc]
+                        <option value="~(id;t)" ~(selectedyear;t)>~(name;t)</option>
+                        [/tlist_sql]
+                    </select>
+                </td>
+                <td class="bold">Term:</td>
+                <td>
+                    <select name="termchoice">
+                        ~[tlist_sql;
+                        SELECT distinct storecode, CASE WHEN storecode = '~[gpv:termchoice]' THEN 'selected' ELSE '' END
+                        selectedterm
+                        FROM termbins
+                        WHERE yearid = ~(curyearid)
+                        AND schoolid = ~(curschoolid)
+                        ORDER BY storecode]
+                        <option value="~(storecode;t)"
+                        ~(selectedterm,t)>~(storecode;t)
+                        [/tlist_sql]
+                    </select>
+                </td>
+                <td class="bold">Class:</td>
+                <td><select name="allgrades">
+                    <option value="All">All Grades
+                    <option
+                    ~[if.~[gpv:allgrades]=EQ]selected[/if] value="EQ">Grade Level =
+                    <option
+                    ~[if.~[gpv:allgrades]=GTE]selected[/if] value="GTE">Grade Level >=
+                    <option
+                    ~[if.~[gpv:allgrades]=LTE]selected[/if] value="LTE">Grade Level <=
+                </select></td>
+                <td>~[custompopup;name=gradelevel;list=gradelevels;default=~[gpv:gradelevel]]</td>
+                <td><input name="choice" type='hidden' value='all'><input type="image" src="/images/btn_create_on.gif"
+                                                                          width="76" height="28" alt="create" border="0"
+                                                                          id="attSubmitButton">
+                </td>
+            </tr>
+            <!-- end of drop-down menus coding -->
+        </table>
+
+
+        <br>
+        <!-- end of content of bounding box -->
+    </form>
+    <p>
+
+        ~[if.~[gpv:se] = all]
+    <center>
+        <div style='margin: 0 auto'><h3>Click the table headers to sort the data. Type in or use the drop down lists to
+            filter the data.</h3></div>
+    </center>
+    [/if]
+    <!-- Start of shaded content table for current grades -->
+    <table border="0" cellspacing="0" cellpadding="2" align="center" class='tablesorter' id='gradetable' style="width: 100% !important; margin: 0px !important;">
+        <thead>
+        <tr>
+            <th class="bold" style="width: 150px;">Teacher Name</th>
+            <th class="bold">Teacher ID</th>
+            <th class="bold">A</th>
+            <th class="bold">A-</th>
+            <th class="bold">B+</th>
+            <th class="bold">B</th>
+            <th class="bold">B-</th>
+            <th class="bold">C+</th>
+            <th class="bold">C</th>
+            <th class="bold">C-</th>
+            <th class="bold">D+</th>
+            <th class="bold">D</th>
+            <th class="bold">D-</th>
+            <th class="bold">F</th>
+            <th class="bold">NG</th>
+            <th class="bold">NM</th>
+            <th class="bold">P</th>
+            <th class="bold">IP</th>
+            <th class="bold">I</th>
+            <th class="bold">GPA</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        ~[tlist_sql;
+        WITH grade_histogram AS (
+            SELECT *
+            FROM (
+              SELECT
+                t.id as teacher_id,
+                sg.grade AS grade
+              FROM
+                STOREDGRADES sg
+                INNER JOIN students s ON sg.studentid = s.id
+                INNER JOIN sections sec ON sg.SECTIONID = sec.ID
+                INNER JOIN cc ON sg.SECTIONID = cc.SECTIONID AND cc.STUDENTID = s.ID
+                INNER JOIN teachers t ON cc.TEACHERID = t.id
+              WHERE
+                s.schoolid = ~(curschoolid)
+                AND trunc(sg.termid / 100) = 2015 - 1991
+                AND sg.storecode = '~[gpv:termchoice]'
+                AND sg.EXCLUDEFROMHONORROLL = 0
+                AND sg.excludefromgpa = 0
+                AND sg.GPA_POINTS BETWEEN 0 AND 5.0
+                AND sg.POTENTIALCRHRS > 0
+                AND sg.grade IS NOT NULL
+                ~[if.~[gpv:allgrades]=EQ]and sg.Grade_Level = ~[gpv:gradelevel][/if]
+                ~[if.~[gpv:allgrades]=GTE]and sg.Grade_Level >= ~[gpv:gradelevel][/if]
+                ~[if.~[gpv:allgrades]=LTE]and sg.Grade_Level <= ~[gpv:gradelevel][/if]
+            )
+              PIVOT
+              (
+                count(grade)
+                FOR grade
+                IN ('A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'NG', 'NM', 'P', 'IP', 'I')
+              )
+        ),
+            teacher_gpas AS (
+              SELECT
+                t.id,
+                CASE WHEN sum(sg.POTENTIALCRHRS) > 0
+                  THEN
+                    round(sum(sg.GPA_POINTS * sg.POTENTIALCRHRS) / sum(sg.POTENTIALCRHRS), 3)
+                ELSE 0.000
+                END AS gpa
+              FROM
+                STOREDGRADES sg
+                INNER JOIN students s ON sg.studentid = s.id
+                INNER JOIN sections sec ON sg.SECTIONID = sec.ID
+                INNER JOIN cc ON sg.SECTIONID = cc.SECTIONID AND cc.STUDENTID = s.ID
+                INNER JOIN teachers t ON cc.TEACHERID = t.id
+              WHERE
+                s.schoolid = ~(curschoolid)
+                AND trunc(sg.termid / 100) = 2015 - 1991
+                AND sg.storecode = '~[gpv:termchoice]'
+                AND sg.EXCLUDEFROMHONORROLL = 0
+                AND sg.excludefromgpa = 0
+                AND sg.GPA_POINTS BETWEEN 0 AND 5.0
+                AND sg.POTENTIALCRHRS > 0
+                AND sg.grade IS NOT NULL
+              GROUP BY t.id
+          )
+        SELECT
+          t.LASTFIRST,
+          gh.*,
+          gpas.gpa
+        FROM grade_histogram gh
+          inner join teacher_gpas gpas on gh.teacher_id=gpas.id
+          INNER JOIN teachers t ON gh.teacher_id = t.id
+        ORDER BY
+        lower(t.lastfirst)
+        ;alternatecolor]
+
+        <tr>
+            <td>~(LastFirst;t)</td>
+            <td>~(teacher_id)</td>
+            <td>~(A)</td>
+            <td>~(A-)</td>
+            <td>~(B+)</td>
+            <td>~(B)</td>
+            <td>~(B-)</td>
+            <td>~(C+)</td>
+            <td>~(C)</td>
+            <td>~(C-)</td>
+            <td>~(D+)</td>
+            <td>~(D)</td>
+            <td>~(D-)</td>
+            <td>~(F)</td>
+            <td>~(NG)</td>
+            <td>~(NM)</td>
+            <td>~(P)</td>
+            <td>~(IP)</td>
+            <td>~(I)</td>
+            <td>~(gpa)</td>
+        </tr>
+        [/tlist_sql]
+        </tbody>
+    </table>
+
+
+    <p>
+    <center>Report generated at ~[time] on ~[date]</center>
+    <p>
+
+        </td>
+        </tr>
+        </table>
+        </form>
+</div>
+<!-- End of shaded content table -->
+
+</body>
+</html>
