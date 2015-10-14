@@ -171,71 +171,62 @@
 
         ~[tlist_sql;
         WITH grade_histogram AS (
-            SELECT *
-            FROM (
-              SELECT
-                t.id as teacher_id,
-                sg.grade AS grade
-              FROM
-                STOREDGRADES sg
-                INNER JOIN students s ON sg.studentid = s.id
-                INNER JOIN sections sec ON sg.SECTIONID = sec.ID
-                INNER JOIN cc ON sg.SECTIONID = cc.SECTIONID AND cc.STUDENTID = s.ID
-                INNER JOIN teachers t ON cc.TEACHERID = t.id
-              WHERE
-                s.schoolid = ~(curschoolid)
-                AND trunc(sg.termid / 100) = 2015 - 1991
-                AND sg.storecode = '~[gpv:termchoice]'
-                AND sg.EXCLUDEFROMHONORROLL = 0
-                AND sg.excludefromgpa = 0
-                AND sg.GPA_POINTS BETWEEN 0 AND 5.0
-                AND sg.POTENTIALCRHRS > 0
-                AND sg.grade IS NOT NULL
-                ~[if.~[gpv:allgrades]=EQ]and sg.Grade_Level = ~[gpv:gradelevel][/if]
-                ~[if.~[gpv:allgrades]=GTE]and sg.Grade_Level >= ~[gpv:gradelevel][/if]
-                ~[if.~[gpv:allgrades]=LTE]and sg.Grade_Level <= ~[gpv:gradelevel][/if]
-            )
-              PIVOT
-              (
-                count(grade)
-                FOR grade
-                IN ('A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'NG', 'NM', 'P', 'IP', 'I')
-              )
-        ),
-            teacher_gpas AS (
-              SELECT
-                t.id,
-                CASE WHEN sum(sg.POTENTIALCRHRS) > 0
-                  THEN
-                    round(sum(sg.GPA_POINTS * sg.POTENTIALCRHRS) / sum(sg.POTENTIALCRHRS), 3)
-                ELSE 0.000
-                END AS gpa
-              FROM
-                STOREDGRADES sg
-                INNER JOIN students s ON sg.studentid = s.id
-                INNER JOIN sections sec ON sg.SECTIONID = sec.ID
-                INNER JOIN cc ON sg.SECTIONID = cc.SECTIONID AND cc.STUDENTID = s.ID
-                INNER JOIN teachers t ON cc.TEACHERID = t.id
-              WHERE
-                s.schoolid = ~(curschoolid)
-                AND trunc(sg.termid / 100) = 2015 - 1991
-                AND sg.storecode = '~[gpv:termchoice]'
-                AND sg.EXCLUDEFROMHONORROLL = 0
-                AND sg.excludefromgpa = 0
-                AND sg.GPA_POINTS BETWEEN 0 AND 5.0
-                AND sg.POTENTIALCRHRS > 0
-                AND sg.grade IS NOT NULL
-              GROUP BY t.id
-          )
+    SELECT *
+    FROM (SELECT
+            t.id     AS teacher_id,
+            sg.grade AS grade
+          FROM STOREDGRADES sg INNER JOIN students s ON sg.studentid = s.id
+            INNER JOIN sections sec ON sg.SECTIONID = sec.ID
+            INNER JOIN cc ON sg.SECTIONID = cc.SECTIONID AND cc.STUDENTID = s.ID
+            INNER JOIN teachers t ON cc.TEACHERID = t.id
+          WHERE
+            t.schoolid = 708
+            AND trunc(sg.termid / 100) = (~[gpv:yearchoice] / 100)
+            AND sg.storecode = '~[gpv:termchoice]' AND
+            sg.EXCLUDEFROMHONORROLL = 0 AND sg.excludefromgpa = 0 AND
+            sg.GPA_POINTS BETWEEN 0 AND 5.0 AND sg.POTENTIALCRHRS > 0 AND sg.grade IS NOT NULL AND
+            sg.Grade_Level >= ~[gpv:gradelevel])
+          PIVOT (count(grade)
+            FOR grade
+            IN ('A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'NG', 'NM', 'P', 'IP', 'I')) ),
+    teacher_gpas AS (
+      SELECT
+        t.id,
+        CASE WHEN
+          sum(
+              sg.POTENTIALCRHRS)
+          >
+          0
+          THEN round(sum(sg.GPA_POINTS * sg.POTENTIALCRHRS) / sum(sg.POTENTIALCRHRS), 3)
+        ELSE 0.000 END AS gpa
+      FROM
+        STOREDGRADES sg
+        INNER JOIN students s ON sg.studentid = s.id
+        INNER JOIN sections sec ON sg.SECTIONID = sec.ID
+        INNER JOIN cc ON sg.SECTIONID = cc.SECTIONID AND cc.STUDENTID = s.ID
+        INNER JOIN teachers t ON cc.TEACHERID = t.id
+      WHERE
+        t.schoolid = 708 AND trunc(sg.termid / 100) = (~[gpv:yearchoice] / 100)
+        AND sg.storecode = '~[gpv:termchoice]'
+        AND sg.EXCLUDEFROMHONORROLL = 0
+        AND sg.excludefromgpa = 0
+        AND sg.GPA_POINTS BETWEEN 0 AND 5.0
+        AND sg.POTENTIALCRHRS > 0
+        AND sg.grade IS NOT NULL
+        AND sg.Grade_Level >= ~[gpv:gradelevel]
+      GROUP BY
+        t.id )
+
         SELECT
           t.LASTFIRST,
           gh.*,
           gpas.gpa
-        FROM grade_histogram gh
-          inner join teacher_gpas gpas on gh.teacher_id=gpas.id
-          INNER JOIN teachers t ON gh.teacher_id = t.id
-        ORDER BY
-        lower(t.lastfirst)
+        FROM
+          grade_histogram gh INNER JOIN
+          teacher_gpas gpas ON gh.teacher_id = gpas.id
+          INNER JOIN
+          teachers t ON gh.teacher_id = t.id
+        ORDER BY lower(t.lastfirst)
         ;alternatecolor]
 
         <tr>
