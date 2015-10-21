@@ -226,6 +226,8 @@
           teacher_gpas gpas ON gh.teacher_id = gpas.id
           INNER JOIN
           teachers t ON gh.teacher_id = t.id
+        WHERE
+          t.LASTFIRST not like '%ATC'
         ORDER BY lower(t.lastfirst)
         ;alternatecolor]
 
